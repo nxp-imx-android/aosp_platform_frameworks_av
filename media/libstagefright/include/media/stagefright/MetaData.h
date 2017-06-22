@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright (C) 2016 Freescale Semiconductor, Inc.*/
 
 #ifndef META_DATA_H_
 
@@ -218,6 +219,15 @@ enum {
     kKeyGridRows         = 'grdR', // int32_t, HEIF grid rows
     kKeyGridCols         = 'grdC', // int32_t, HEIF grid columns
     kKeyIccProfile       = 'prof', // raw data, ICC prifile data
+
+    kKeyIsADIF            = 'adif',  // bool (int32_t)
+    kKeySubFormat         = 'sFmt', // (int32_t)
+    kKeyCodecData         = 'cCdd', // raw data
+    kKeyBitPerSample         = 'bPsp', // (int32_t)
+    kKeyAudioBlockAlign         = 'aBan', // (int32_t)
+    kKeyBitsPerFrame            = 'bPfm',
+    kKeyIsEndianBig             = 'edbg', //bool (int32_t)
+    kKeySpecialThumbnail            = 'sThb',//int32_t
 };
 
 enum {
