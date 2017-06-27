@@ -22,6 +22,7 @@
 #include <media/hardware/VideoAPI.h>
 #include <media/stagefright/SurfaceUtils.h>
 #include <gui/Surface.h>
+#include <media/stagefright/graphics_ext.h>
 
 extern "C" int android_get_application_target_sdk_version();
 
