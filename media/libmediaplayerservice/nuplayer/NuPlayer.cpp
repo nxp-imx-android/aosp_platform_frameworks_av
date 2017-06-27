@@ -214,6 +214,7 @@ NuPlayer::NuPlayer(pid_t pid, const sp<MediaClock> &mediaClock)
       mDataSourceType(DATA_SOURCE_TYPE_NONE) {
     CHECK(mediaClock != NULL);
     clearFlushComplete();
+    mRendering = false;
 }
 
 NuPlayer::~NuPlayer() {
@@ -1308,6 +1309,7 @@ void NuPlayer::onMessageReceived(const sp<AMessage> &msg) {
                 if(mVideoDecoder != NULL)
                     scheduleSetVideoDecoderTime();
                 notifyListener(MEDIA_STARTED, 0, 0);
+                mRendering = true;
             } else if (what == Renderer::kWhatAudioTearDown) {
                 int32_t reason;
                 CHECK(msg->findInt32("reason", &reason));
@@ -2389,6 +2391,7 @@ void NuPlayer::performSeek(int64_t seekTimeUs, MediaPlayerSeekMode mode) {
     ++mTimedTextGeneration;
 
     // everything's flushed, continue playback.
+    mRendering = false;
 }
 
 void NuPlayer::performDecoderFlush(FlushCommand audio, FlushCommand video) {
@@ -2450,6 +2453,7 @@ void NuPlayer::performReset() {
     mPrepared = false;
     mResetting = false;
     mSourceStarted = false;
+    mRendering = false;
 
     // Modular DRM
     if (mCrypto != NULL) {
@@ -2666,7 +2670,7 @@ void NuPlayer::onSourceNotify(const sp<AMessage> &msg) {
         case Source::kWhatPauseOnBufferingStart:
         {
             // ignore if not playing
-            if (mStarted) {
+            if (mStarted && mRendering) {
                 ALOGI("buffer low, pausing...");
 
                 startRebufferingTimer();
