@@ -309,6 +309,10 @@ cc_library_static {
             // enable experiments only in userdebug and eng builds
             cflags: ["-DENABLE_STAGEFRIGHT_EXPERIMENTS"],
         },
+        hantro_vpu: {
+            // enable HANTRO_VPU only when BOARD_VPU_TYPE=hantro
+            cflags: ["-DHANTRO_VPU"],
+        },
     },
 
     sanitize: {
