@@ -8333,6 +8333,10 @@ bool ACodec::ExecutingState::onOMXEvent(
 
         case OMX_EventBufferFlag:
         {
+            /* video decoder must post the EOS to player in tunnel playback */
+            if (data2 == OMX_BUFFERFLAG_EOS && mCodec->mTunneled) {
+                mCodec->mCallback->onEos(ERROR_END_OF_STREAM, mCodec->mTunneled);
+            }
             return true;
         }
 
@@ -8550,10 +8554,6 @@ bool ACodec::ExecutingToIdleState::onOMXEvent(
         case OMX_EventBufferFlag:
         {
             // We're shutting down and don't care about this anymore.
-            /* video decoder must post the EOS to player in tunnel playback */
-            if (data2 == OMX_BUFFERFLAG_EOS && mCodec->mTunneled) {
-                mCodec->mCallback->onEos(ERROR_END_OF_STREAM, mCodec->mTunneled);
-            }
             return true;
         }
 
