@@ -297,7 +297,6 @@ private:
 
     OMX_INDEXTYPE mDescribeColorAspectsIndex;
     OMX_INDEXTYPE mDescribeHDRStaticInfoIndex;
-    bool mIsHDR;
 
     std::shared_ptr<ACodecBufferChannel> mBufferChannel;
 
