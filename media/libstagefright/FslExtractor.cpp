@@ -1705,7 +1705,7 @@ status_t FslExtractor::ParseVideo(uint32 index, uint32 type,uint32 subtype)
     if(!strcmp(mMime, MEDIA_MIMETYPE_CONTAINER_FLV))
         thumbnail_ts = 0;
 
-    if (type == VIDEO_H264) {
+    if (type == VIDEO_H264 || type == VIDEO_HEVC) {
         // AVC requires compression ratio of at least 2, and uses
         // macroblocks
         max_size = ((width + 15) / 16) * ((height + 15) / 16) * 192;
@@ -1714,9 +1714,11 @@ status_t FslExtractor::ParseVideo(uint32 index, uint32 type,uint32 subtype)
         // ratio. Use compression ratio of 1.
         max_size = width * height * 3 / 2;
     }
+    max_size += max_size / 10;
+
     if(0 == max_size)
         max_size = MAX_VIDEO_BUFFER_SIZE;
-    max_size += 20;
+
 
     meta->setInt32(kKeyMaxInputSize, max_size);
 
