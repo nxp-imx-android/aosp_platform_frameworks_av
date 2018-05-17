@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /* Copyright (C) 2016 Freescale Semiconductor, Inc. */
+/* Copyright 2018 NXP */
+
 //#define LOG_NDEBUG 0
 #define LOG_TAG "MediaExtractor"
 #include <utils/Log.h>
@@ -229,6 +231,8 @@ sp<MediaExtractor> MediaExtractor::CreateFromService(
     } else if(!strcasecmp(mime, MEDIA_MIMETYPE_CONTAINER_ASF)){
         ret = new FslExtractor(source,mime);
     } else if(!strcasecmp(mime, MEDIA_MIMETYPE_CONTAINER_RMVB)){
+        ret = new FslExtractor(source,mime);
+    } else if(!strcasecmp(mime, MEDIA_MIMETYPE_CONTAINER_DSF)){
         ret = new FslExtractor(source,mime);
     } else if(!strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_APE)) {
         ret = new FslExtractor(source,mime);

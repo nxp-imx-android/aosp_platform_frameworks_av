@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /* Copyright (C) 2015-2016 Freescale Semiconductor, Inc.*/
+/* Copyright 2018 NXP */
+
 #include <media/MediaDefs.h>
 
 namespace android {
@@ -74,6 +76,7 @@ const char *MEDIA_MIMETYPE_TEXT_ASS = "text/ass";
 const char *MEDIA_MIMETYPE_CONTAINER_FLV = "video/flv";
 const char *MEDIA_MIMETYPE_CONTAINER_ASF = "video/x-ms-wmv";
 const char *MEDIA_MIMETYPE_CONTAINER_RMVB = "video/rmff";
+const char *MEDIA_MIMETYPE_CONTAINER_DSF = "audio/dsf";
 
 
 const char *MEDIA_MIMETYPE_VIDEO_DIV3 = "video/x-div3";
@@ -93,5 +96,7 @@ const char *MEDIA_MIMETYPE_AUDIO_REAL= "audio/x-pn-realaudio";
 const char *MEDIA_MIMETYPE_AUDIO_APE= "audio/x-monkeys-audio";
 const char *MEDIA_MIMETYPE_AUDIO_AAC_FSL = "audio/aac-fsl";
 const char *MEDIA_MIMETYPE_AUDIO_BSAC = "audio/x-bsac";
+const char *MEDIA_MIMETYPE_AUDIO_DSD = "audio/dsd";
+
 
 }  // namespace android
