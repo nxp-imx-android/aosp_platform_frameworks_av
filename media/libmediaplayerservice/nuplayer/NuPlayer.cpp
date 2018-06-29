@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /* Copyright (C) 2013-2016 Freescale Semiconductor, Inc. */
-/* Copyright 2017 NXP */
+/* Copyright 2017-2018 NXP */
 //#define LOG_NDEBUG 0
 #define LOG_TAG "NuPlayer"
 
@@ -284,15 +284,13 @@ void NuPlayer::setDataSourceAsync(
         mDataSourceType = DATA_SOURCE_TYPE_RTSP;
         mStreaming = true;
     }
-//#define RTPUDP_BY_STREAMING_SOURCE
-#ifdef RTPUDP_BY_STREAMING_SOURCE
-    else if(!strncasecmp(url, "rtp://", 6)
-      || !strncasecmp(url, "udp://", 6)){
+    else if((!strncasecmp(url, "rtp://", 6) || !strncasecmp(url, "udp://", 6))
+         && (property_get_int32("media.rtp_streaming.low_latency", 0) & 0x01)
+        ){
         sp<IStreamSource> iss = new GenericStreamSource(url);
         source = new StreamingSource(notify, iss);
         mDataSourceType = DATA_SOURCE_TYPE_RTPUDP;
     }
-#endif
     else if ((!strncasecmp(url, "http://", 7)
                 || !strncasecmp(url, "https://", 8))
                     && ((len >= 4 && !strcasecmp(".sdp", &url[len - 4]))
