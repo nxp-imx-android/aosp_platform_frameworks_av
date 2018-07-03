@@ -80,11 +80,6 @@ LOCAL_SHARED_LIBRARIES:= \
     android.hardware.camera.device@3.2 \
     android.hardware.camera.device@3.3
 
-ifeq ($(OPENCL_2D_IN_CAMERA),true)
-LOCAL_SHARED_LIBRARIES += \
-    libopencl-2d
-endif
-
 LOCAL_EXPORT_SHARED_LIBRARY_HEADERS := libbinder libcamera_client libfmq
 
 LOCAL_C_INCLUDES += \
@@ -96,10 +91,6 @@ LOCAL_EXPORT_C_INCLUDE_DIRS := \
     frameworks/av/services/camera/libcameraservice
 
 LOCAL_CFLAGS += -Wall -Wextra -Werror
-
-ifeq ($(OPENCL_2D_IN_CAMERA),true)
-LOCAL_CFLAGS += -DOPENCL_2D_IN_CAMERA
-endif
 
 # Workaround for invalid unused-lambda-capture warning http://b/38349491
 LOCAL_CLANG_CFLAGS += -Wno-error=unused-lambda-capture
