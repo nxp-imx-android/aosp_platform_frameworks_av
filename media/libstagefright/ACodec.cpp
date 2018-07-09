@@ -3603,6 +3603,7 @@ status_t ACodec::setSupportedOutputFormat(bool getLegacyFlexibleFormat) {
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar8x128Tiled
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar8x4Tiled
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar4x4Tiled
+                || format.eColorFormat == OMX_COLOR_Format16bitRGB565
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar4x4TiledCompressed) {
             break;
         }
