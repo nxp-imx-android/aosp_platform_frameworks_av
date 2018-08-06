@@ -476,6 +476,13 @@ void NuPlayer::Renderer::changeAudioFormat(
     msg->post();
 }
 
+void NuPlayer::Renderer::enableSyncQueue(bool bEnabled)
+{
+    sp<AMessage> msg = new AMessage(kWhatEnableSyncQueue, this);
+    msg->setInt32("enable", (bEnabled ? 1 : 0));
+    msg->post();
+}
+
 void NuPlayer::Renderer::onMessageReceived(const sp<AMessage> &msg) {
     switch (msg->what()) {
         case kWhatOpenAudioSink:
