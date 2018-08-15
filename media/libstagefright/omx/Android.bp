@@ -79,21 +79,6 @@ cc_library_shared {
         "-Wno-documentation",
     ],
 
-    product_variables: {
-        hantro_vpu: {
-            // enable HANTRO_VPU only when BOARD_VPU_TYPE=hantro
-            cflags: ["-DHANTRO_VPU"],
-        },
-        chipsmedia_vpu: {
-            // enable DCHIPSMEDIA_VPU only when BOARD_VPU_TYPE=chipsmedia
-            cflags: ["-DCHIPSMEDIA_VPU"],
-        },
-        malone_vpu: {
-            // enable DMALONE_VPU only when BOARD_VPU_TYPE=malone
-            cflags: ["-DMALONE_VPU"],
-        },
-    },
-
     sanitize: {
         misc_undefined: [
             "signed-integer-overflow",

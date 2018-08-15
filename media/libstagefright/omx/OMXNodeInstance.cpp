@@ -1536,13 +1536,8 @@ status_t OMXNodeInstance::allocateSecureBuffer(
     *buffer = makeBufferID(header);
     if (mSecureBufferType[portIndex] == kSecureBufferTypeNativeHandle) {
         *buffer_data = NULL;
-        #ifdef HANTRO_VPU
-        *native_handle = NativeHandle::create(
-                (native_handle_t *)header->pBuffer, true /* ownsHandle */);
-        #else
         *native_handle = NativeHandle::create(
                 (native_handle_t *)header->pBuffer, false /* ownsHandle */);
-        #endif
     } else {
         *buffer_data = header->pBuffer;
         *native_handle = NULL;
