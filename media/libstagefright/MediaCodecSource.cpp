@@ -467,6 +467,13 @@ MediaCodecSource::MediaCodecSource(
 MediaCodecSource::~MediaCodecSource() {
     releaseEncoder();
 
+    MediaBufferBase* mbuf = NULL;
+    while(mPuller->readBuffer(&mbuf)){
+        if (!mIsVideo && mbuf != NULL) {
+            mbuf->release();
+        }
+    }
+
     mCodecLooper->stop();
     mLooper->unregisterHandler(mReflector->id());
 }
