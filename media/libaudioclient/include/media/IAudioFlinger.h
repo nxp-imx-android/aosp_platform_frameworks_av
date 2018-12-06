@@ -526,6 +526,11 @@ public:
 
     // Requests media.log to start merging log buffers
     virtual void requestLogMerge() = 0;
+
+    virtual status_t    onAudioTransact( uint32_t code,
+                                    const Parcel& data,
+                                    Parcel* reply,
+                                    uint32_t flags);
 };
 
 // ----------------------------------------------------------------------------

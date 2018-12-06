@@ -24,6 +24,7 @@
 
 #include <binder/IPCThreadState.h>
 #include <binder/Parcel.h>
+#include <cutils/properties.h>
 #include <media/TimeCheck.h>
 #include <mediautils/ServiceUtilities.h>
 #include "IAudioFlinger.h"
@@ -999,8 +1000,23 @@ status_t BnAudioFlinger::onTransact(
     }
 
     std::string tag("IAudioFlinger command " + std::to_string(code));
-    TimeCheck check(tag.c_str());
 
+    status_t status;
+    int lpa_enable = property_get_int32("vendor.audio.lpa.enable", 0);
+    if(lpa_enable) {
+        ALOGD("IAudioFlinger: disable timecheck in LPA mode");
+        status = onAudioTransact(code, data, reply, flags);
+    } else {
+        TimeCheck check(tag.c_str());
+        status = onAudioTransact(code, data, reply, flags);
+    }
+
+    return status;
+}
+
+status_t BnAudioFlinger::onAudioTransact(
+    uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+{
     switch (code) {
         case CREATE_TRACK: {
             CHECK_INTERFACE(IAudioFlinger, data, reply);
