@@ -41,7 +41,7 @@
 namespace android {
 
 static const int64_t kBufferTimeOutUs = 10000ll; // 10 msec
-static const size_t kRetryCount = 50; // must be >0
+static const size_t kRetryCount = 200; // must be >0
 
 sp<IMemory> allocVideoFrame(const sp<MetaData>& trackMeta,
         int32_t width, int32_t height, int32_t tileWidth, int32_t tileHeight,
