@@ -41,6 +41,7 @@
 #include <media/stagefright/foundation/ByteUtils.h>
 #include <media/stagefright/MetaData.h>
 #include <media/stagefright/MediaDefs.h>
+#include <media/stagefright/MediaDefsExt.h>
 #include <media/AudioSystem.h>
 #include <media/MediaPlayerInterface.h>
 #include <media/stagefright/Utils.h>
