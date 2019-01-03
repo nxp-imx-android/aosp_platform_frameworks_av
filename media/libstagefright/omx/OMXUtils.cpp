@@ -23,6 +23,7 @@
 #include <media/stagefright/foundation/ADebug.h>
 #include <media/stagefright/foundation/AUtils.h>
 #include <media/stagefright/foundation/MediaDefs.h>
+#include <media/stagefright/MediaDefsExt.h>
 #include <media/stagefright/MediaErrors.h>
 #include <media/hardware/HardwareAPI.h>
 #include <system/graphics-base.h>
