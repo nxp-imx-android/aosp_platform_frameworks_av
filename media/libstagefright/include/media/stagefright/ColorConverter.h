@@ -85,6 +85,8 @@ private:
     status_t convertTIYUV420PackedSemiPlanar(
             const BitmapParams &src, const BitmapParams &dst);
     status_t convertYUV422PlanartoYUV420Planar(const BitmapParams &src);
+    status_t convertYCbYCr(
+            const BitmapParams &src, const BitmapParams &dst);
 
     void writeToDst(void *dst_ptr, uint8_t *kAdjustedClip, bool uncropped,
             signed r1, signed g1, signed b1,
