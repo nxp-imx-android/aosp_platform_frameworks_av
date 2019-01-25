@@ -4,3 +4,4 @@ service mediadrm /system/bin/mediadrmserver
     group mediadrm drmrpc
     ioprio rt 4
     writepid /dev/cpuset/foreground/tasks
+    disabled
