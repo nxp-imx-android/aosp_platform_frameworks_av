@@ -514,6 +514,7 @@ AudioFlinger::ThreadBase::ThreadBase(const sp<AudioFlinger>& audioFlinger, audio
         mSystemReady(systemReady),
         mSignalPending(false)
 {
+    m_lpa_enable = property_get_int32("vendor.audio.lpa.enable", 0);
     memset(&mPatch, 0, sizeof(struct audio_patch));
 }
 
@@ -897,9 +898,7 @@ String16 AudioFlinger::ThreadBase::getWakeLockTag()
 
 void AudioFlinger::ThreadBase::acquireWakeLock_l()
 {
-    int lpa_enable = property_get_int32("vendor.audio.lpa.enable", 0);
-
-    if (lpa_enable == 1)
+    if (m_lpa_enable == 1)
         return;
 
     getPowerManager_l();
@@ -5335,13 +5334,18 @@ AudioFlinger::PlaybackThread::mixer_state AudioFlinger::DirectOutputThread::prep
                     // it will then automatically call start() when data is available
                     track->disable();
                 } else if (last) {
-                    ALOGW("pause because of UNDERRUN, framesReady = %zu,"
-                            "minFrames = %u, mFormat = %#x",
-                            track->framesReady(), minFrames, mFormat);
-                    mixerStatus = MIXER_TRACKS_ENABLED;
-                    if (mHwSupportsPause && !mHwPaused && !mStandby) {
-                        doHwPause = true;
-                        mHwPaused = true;
+                    if(m_lpa_enable)
+                        track->mRetryCount++;
+                    else {
+                        ALOGW("pause because of UNDERRUN, framesReady = %zu,"
+                                "minFrames = %u, mFormat = %#x",
+                                track->framesReady(), minFrames, mFormat);
+
+                        mixerStatus = MIXER_TRACKS_ENABLED;
+                        if (mHwSupportsPause && !mHwPaused && !mStandby) {
+                            doHwPause = true;
+                            mHwPaused = true;
+                        }
                     }
                 }
             }

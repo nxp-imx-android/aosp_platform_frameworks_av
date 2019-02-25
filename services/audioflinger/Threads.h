@@ -396,6 +396,7 @@ public:
     mutable     Mutex                   mLock;
 
 protected:
+                int m_lpa_enable;
 
                 // entry describing an effect being suspended in mSuspendedSessions keyed vector
                 class SuspendedSessionDesc : public RefBase {
