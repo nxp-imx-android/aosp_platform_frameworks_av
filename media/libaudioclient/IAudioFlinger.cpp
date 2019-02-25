@@ -952,13 +952,22 @@ status_t BnAudioFlinger::onTransact(
             break;
     }
 
+    status_t status;
     int lpa_enable = property_get_int32("vendor.audio.lpa.enable", 0);
-    if (!lpa_enable) {
-        TimeCheck check("IAudioFlinger");
-    } else {
+    if(lpa_enable) {
         ALOGD("IAudioFlinger: disable timecheck in LPA mode");
+        status = onAudioTransact(code, data, reply, flags);
+    } else {
+        TimeCheck check("IAudioFlinger");
+        status = onAudioTransact(code, data, reply, flags);
     }
 
+    return status;
+}
+
+status_t BnAudioFlinger::onAudioTransact(
+    uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+{
     switch (code) {
         case CREATE_TRACK: {
             CHECK_INTERFACE(IAudioFlinger, data, reply);
