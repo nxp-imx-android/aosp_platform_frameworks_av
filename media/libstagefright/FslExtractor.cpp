@@ -1567,6 +1567,8 @@ status_t FslExtractor::ParseMediaFormat()
             ret = ParseAudio(i,decoderType,decoderSubtype);
         else if(trackType == MEDIA_TEXT)
             ret = ParseText(i,decoderType,decoderSubtype);
+        else
+            ret = UNKNOWN_ERROR;
 
         if(ret)
             continue;
