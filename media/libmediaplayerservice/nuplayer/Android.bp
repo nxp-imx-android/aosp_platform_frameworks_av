@@ -42,12 +42,23 @@ cc_library_static {
         "-Wall",
     ],
 
+
     product_variables: {
         debuggable: {
-            cflags: [
-                "-DENABLE_STAGEFRIGHT_EXPERIMENTS",
-            ],
-        }
+            cflags: ["-DENABLE_STAGEFRIGHT_EXPERIMENTS"],
+        },
+        hantro_vpu: {
+            // enable HANTRO_VPU only when BOARD_VPU_TYPE=hantro
+            cflags: ["-DHANTRO_VPU"],
+        },
+        chipsmedia_vpu: {
+            // enable DCHIPSMEDIA_VPU only when BOARD_VPU_TYPE=chipsmedia
+            cflags: ["-DCHIPSMEDIA_VPU"],
+        },
+        malone_vpu: {
+            // enable DMALONE_VPU only when BOARD_VPU_TYPE=malone
+            cflags: ["-DMALONE_VPU"],
+        },
     },
 
     shared_libs: [

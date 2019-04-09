@@ -355,10 +355,27 @@ void NuPlayer::Decoder::onConfigure(const sp<AMessage> &format) {
             format->setInt32("color-format", 0x7F000003);//OMX_COLOR_FormatYUV420SemiPlanar8x4Tiled
         }else if( property_get_int32("media.amphion_vpu.enable-tile", 0)){
             format->setInt32("color-format", 0x7F000002);//OMX_COLOR_FormatYUV420SemiPlanar8x128Tiled
+            ALOGI("use tile format by property");
         }else{
             format->setInt32("color-format", 21);//OMX_COLOR_FormatYUV420SemiPlanar
         }
+#ifdef MALONE_VPU
+        AString consumer_name;
+        int32_t input_width = 0;
+        if(mSurface != NULL)
+            consumer_name = mSurface->getConsumerName();
 
+        format->findInt32("width", &input_width);
+
+        //set tile format when play 4K video with SurfaceView
+        //SurfaceView means GPU will not touch VPU output and directly pass to surfaceflinger to do composition.
+        //SurfaceTexure means VPU output will be further process by GPU 3D as a YUV texture and finally will process as RGB layer, then pass to surfaceflinger to do composition.
+        //As GPU can't handle VPU tile directly, so only enable VPU tile for SurfaceView.
+        if(consumer_name.size() > 0 && input_width >= 3840 && consumer_name.startsWith("SurfaceView")){
+            format->setInt32("color-format", 0x7F000002);
+            ALOGI("use tile format by SurfaceView");
+        }
+#endif
         int tunneled = property_get_int32("media.omx.enable-tunnel", 0);
         format->setInt32("feature-tunneled-playback", tunneled);
     }
