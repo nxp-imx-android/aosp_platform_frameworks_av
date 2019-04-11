@@ -26,13 +26,13 @@
 namespace {
 
 void read_func(struct aiocb *aiocbp) {
-    aiocbp->ret = TEMP_FAILURE_RETRY(pread(aiocbp->aio_fildes,
+    aiocbp->ret = TEMP_FAILURE_RETRY(pread64(aiocbp->aio_fildes,
                 aiocbp->aio_buf, aiocbp->aio_nbytes, aiocbp->aio_offset));
     if (aiocbp->ret == -1) aiocbp->error = errno;
 }
 
 void write_func(struct aiocb *aiocbp) {
-    aiocbp->ret = TEMP_FAILURE_RETRY(pwrite(aiocbp->aio_fildes,
+    aiocbp->ret = TEMP_FAILURE_RETRY(pwrite64(aiocbp->aio_fildes,
                 aiocbp->aio_buf, aiocbp->aio_nbytes, aiocbp->aio_offset));
     if (aiocbp->ret == -1) aiocbp->error = errno;
 }
@@ -69,7 +69,7 @@ int aio_suspend(struct aiocb *aiocbp[], int n,
     return 0;
 }
 
-void aio_prepare(struct aiocb *aiocbp, void* buf, size_t count, off_t offset) {
+void aio_prepare(struct aiocb *aiocbp, void* buf, size_t count, loff_t offset) {
     aiocbp->aio_buf = buf;
     aiocbp->aio_offset = offset;
     aiocbp->aio_nbytes = count;
