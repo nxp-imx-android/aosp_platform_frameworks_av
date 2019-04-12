@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/* Copyright 2019 NXP */
 //#define LOG_NDEBUG 0
 #define LOG_TAG "MediaCodecsXmlParser"
 
@@ -121,6 +121,19 @@ MediaCodecsXmlParser::MediaCodecsXmlParser(
     mUpdate(false),
     mCodecCounter(0) {
     std::string path;
+    FILE *f = fopen("/sys/devices/soc0/soc_id", "r");
+    if(!f)
+        ALOGE("open soc_id fail!");
+    else{
+        char inputBuf[20];
+        if(fgets(inputBuf, sizeof(inputBuf), f) != NULL){
+            if(!strncmp(inputBuf, "i.MX8QM", 7))
+                mainXmlName = "media_codecs_8qm.xml";
+            else if(!strncmp(inputBuf, "i.MX8QXP", 8))
+                mainXmlName = "media_codecs_8qxp.xml";
+        }
+        fclose(f);
+    }
     if (findFileInDirs(searchDirs, mainXmlName, &path)) {
         parseTopLevelXMLFile(path.c_str(), false);
     } else {
