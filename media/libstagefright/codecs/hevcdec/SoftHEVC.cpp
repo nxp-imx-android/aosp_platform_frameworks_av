@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright 2019 NXP */
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "SoftHEVC"
@@ -105,6 +106,18 @@ static size_t GetCPUCoreCount() {
     cpuCoreCount = sysconf(_SC_NPROC_ONLN);
 #endif
     CHECK(cpuCoreCount >= 1);
+    FILE *f = fopen("/sys/devices/soc0/soc_id", "r");
+    if(!f)
+        ALOGE("open soc_id fail!");
+    else{
+        char inputBuf[20];
+        if(fgets(inputBuf, sizeof(inputBuf), f) != NULL){
+            if(!strncmp(inputBuf, "i.MX8QM", 7))
+                cpuCoreCount = 2;
+        }
+        fclose(f);
+    }
+
     ALOGV("Number of CPU cores: %ld", cpuCoreCount);
     return (size_t)cpuCoreCount;
 }
