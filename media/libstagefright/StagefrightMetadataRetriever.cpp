@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/* Copyright 2019 NXP */
 //#define LOG_NDEBUG 0
 #define LOG_TAG "StagefrightMetadataRetriever"
 
@@ -638,6 +638,17 @@ void StagefrightMetadataRetriever::parseMetaData() {
                 mMetaData.add(
                         METADATA_KEY_MIMETYPE, String8("audio/x-matroska"));
             }
+        }
+    }
+    const char *fileMIME;
+    if(meta->findCString(kKeyMIMEType, &fileMIME)){
+        if(!strcasecmp(fileMIME, "video/rmff")){
+            if(!hasVideo && hasAudio)
+                mMetaData.add(METADATA_KEY_MIMETYPE, String8("audio/rmff"));
+        }
+        else if(!strcasecmp(fileMIME, "video/x-ms-wmv")){
+            if(!hasVideo && hasAudio)
+                mMetaData.add(METADATA_KEY_MIMETYPE, String8("audio/x-ms-wma"));
         }
     }
 }
