@@ -1365,11 +1365,12 @@ void NuPlayer::Decoder::rememberCodecSpecificData(const sp<AMessage> &format) {
     if (format == NULL) {
         return;
     }
-
+    #ifndef MALONE_VPU
     //freescale video decoder will keep codec data, so do not need to submit again
     if (mComponentName.startsWith("OMX.Freescale.std.video_decoder")){
         return;
     }
+    #endif
 
     mCSDsForCurrentFormat.clear();
     for (int32_t i = 0; ; ++i) {
