@@ -119,7 +119,6 @@ void SoftwareRenderer::resetFormatIfChanged(
     size_t bufWidth = mCropWidth;
     size_t bufHeight = mCropHeight;
 
-    bool use_align_yv12 = false;
     // hardware has YUV12 and RGBA8888 support, so convert known formats
     {
         switch (mColorFormat) {
@@ -130,7 +129,6 @@ void SoftwareRenderer::resetFormatIfChanged(
                 halFormat = HAL_PIXEL_FORMAT_YV12;
                 bufWidth = (mCropWidth + 1) & ~1;
                 bufHeight = (mCropHeight + 1) & ~1;
-                use_align_yv12 = true;
                 break;
             }
             case OMX_COLOR_Format24bitRGB888:
@@ -198,18 +196,10 @@ void SoftwareRenderer::resetFormatIfChanged(
             NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW));
 
     // Width must be multiple of 32???
-    if(!use_align_yv12){
-        CHECK_EQ(0, native_window_set_buffers_dimensions(
-                    mNativeWindow.get(),
-                    bufWidth,
-                    bufHeight));
-    }else{
-        //use alignment 4 for height
-        CHECK_EQ(0, native_window_set_buffers_dimensions(
-                    mNativeWindow.get(),
-                    ALIGN(bufWidth, 32),
-                    ALIGN(bufHeight, 4)));
-    }
+    CHECK_EQ(0, native_window_set_buffers_dimensions(
+                mNativeWindow.get(),
+                bufWidth,
+                bufHeight));
     CHECK_EQ(0, native_window_set_buffers_format(
                 mNativeWindow.get(),
                 halFormat));
@@ -302,9 +292,9 @@ std::list<FrameRenderTracker::Info> SoftwareRenderer::render(
         src_v +=(mCropLeft + mCropTop * mWidth / 2)/2;
 
         uint8_t *dst_y = (uint8_t *)dst;
-        size_t dst_y_size = buf->stride * ALIGN(buf->height, 4);
+        size_t dst_y_size = buf->stride * buf->height;
         size_t dst_c_stride = ALIGN(buf->stride / 2, 16);
-        size_t dst_c_size = dst_c_stride * ALIGN(buf->height, 4) / 2;
+        size_t dst_c_size = dst_c_stride * buf->height / 2;
         uint8_t *dst_v = dst_y + dst_y_size;
         uint8_t *dst_u = dst_v + dst_c_size;
 
@@ -379,9 +369,9 @@ std::list<FrameRenderTracker::Info> SoftwareRenderer::render(
 
         uint8_t *dst_y = (uint8_t *)dst;
 
-        size_t dst_y_size = buf->stride * ALIGN(buf->height, 4);
+        size_t dst_y_size = buf->stride * buf->height;
         size_t dst_c_stride = ALIGN(buf->stride / 2, 16);
-        size_t dst_c_size = dst_c_stride * ALIGN(buf->height, 4) / 2;
+        size_t dst_c_size = dst_c_stride * buf->height / 2;
         uint8_t *dst_v = dst_y + dst_y_size;
         uint8_t *dst_u = dst_v + dst_c_size;
 
