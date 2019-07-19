@@ -65,12 +65,7 @@ int main(int argc __unused, char** argv)
     sp<ProcessState> proc(ProcessState::self());
     sp<IServiceManager> sm = defaultServiceManager();
     MediaExtractorService::instantiate();
-
-    std::string value = base::GetProperty("ro.build.type", "unknown");
-    if (value == "userdebug" || value == "eng") {
-        media::MediaExtractorUpdateService::instantiate();
-    }
-
+    media::MediaExtractorUpdateService::instantiate();
     ProcessState::self()->startThreadPool();
     IPCThreadState::self()->joinThreadPool();
 }
