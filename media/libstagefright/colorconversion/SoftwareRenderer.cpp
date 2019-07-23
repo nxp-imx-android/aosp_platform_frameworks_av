@@ -268,10 +268,11 @@ std::list<FrameRenderTracker::Info> SoftwareRenderer::render(
 
     void *dst = NULL;
     struct android_ycbcr ycbcr;
-    if ( mColorFormat == OMX_COLOR_FormatYUV420Planar ||
+    if ( !mConverter &&
+         (mColorFormat == OMX_COLOR_FormatYUV420Planar ||
          mColorFormat == OMX_COLOR_FormatYUV420SemiPlanar ||
          mColorFormat == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar ||
-         (mColorFormat == OMX_COLOR_FormatYUV420Planar16 && !mConverter)) {
+         mColorFormat == OMX_COLOR_FormatYUV420Planar16)) {
         CHECK_EQ(0, mapper.lockYCbCr(buf->handle,
                 GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_RARELY,
                 bounds, &ycbcr));
