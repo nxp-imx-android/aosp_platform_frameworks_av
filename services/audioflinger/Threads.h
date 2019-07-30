@@ -530,6 +530,7 @@ public:
     virtual     bool isStreamInitialized() = 0;
 
 protected:
+                int m_lpa_enable;
 
                 // entry describing an effect being suspended in mSuspendedSessions keyed vector
                 class SuspendedSessionDesc : public RefBase {
