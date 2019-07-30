@@ -537,6 +537,7 @@ AudioFlinger::ThreadBase::ThreadBase(const sp<AudioFlinger>& audioFlinger, audio
         mSignalPending(false)
 {
     mThreadMetrics.logConstructor(getpid(), threadTypeToString(type), id);
+    m_lpa_enable = property_get_int32("vendor.audio.lpa.enable", 0);
     memset(&mPatch, 0, sizeof(struct audio_patch));
 }
 
@@ -1063,6 +1064,9 @@ String16 AudioFlinger::ThreadBase::getWakeLockTag()
 
 void AudioFlinger::ThreadBase::acquireWakeLock_l()
 {
+    if (m_lpa_enable == 1)
+        return;
+
     getPowerManager_l();
     if (mPowerManager != 0) {
         sp<IBinder> binder = new BBinder();
