@@ -112,8 +112,8 @@ cc_library_static {
     },
 }
 
-cc_library {
-    name: "libstagefright",
+libstagefright_defaults {
+    name: "libstagefright_default",
 
     srcs: [
         "AACWriter.cpp",
@@ -261,6 +261,28 @@ cc_library {
     },
 }
 
+bootstrap_go_package {
+    name: "soong-libstagefright",
+    pkgPath: "android/soong/frameworks/av/media/libstagefright",
+    deps: [
+        "blueprint",
+        "blueprint-pathtools",
+        "soong",
+        "soong-android",
+        "soong-cc",
+        "soong-genrule",
+    ],
+    srcs: [
+        "libstagefright.go",
+    ],
+    pluginFor: ["soong_build"],
+}
+
+cc_library {
+    name: "libstagefright",
+    defaults: ["libstagefright_default"],
+}
+
 cc_library_static {
     name: "libstagefright_player2",
 
@@ -308,10 +330,6 @@ cc_library_static {
         debuggable: {
             // enable experiments only in userdebug and eng builds
             cflags: ["-DENABLE_STAGEFRIGHT_EXPERIMENTS"],
-        },
-        hantro_vpu: {
-            // enable HANTRO_VPU only when BOARD_VPU_TYPE=hantro
-            cflags: ["-DHANTRO_VPU"],
         },
     },
 
