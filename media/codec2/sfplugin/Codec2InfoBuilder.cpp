@@ -393,7 +393,8 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
             case 0:
                 continue;
             case 1:
-                if (hasPrefix(canonName, "c2.vda.")) {
+                if (hasPrefix(canonName, "c2.imx.")) {
+                    rank = 1;
                     break;
                 }
                 if (hasPrefix(canonName, "c2.android.")) {
@@ -410,7 +411,8 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
                 }
                 continue;
             case 2:
-                if (hasPrefix(canonName, "c2.vda.")) {
+                if (hasPrefix(canonName, "c2.imx.")) {
+                    rank = 1;
                     break;
                 }
                 if (hasPrefix(canonName, "c2.android.")) {
