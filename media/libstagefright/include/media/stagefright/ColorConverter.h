@@ -128,6 +128,9 @@ private:
     status_t convertTIYUV420PackedSemiPlanar(
             const BitmapParams &src, const BitmapParams &dst);
 
+    status_t convertYCbYCr(
+            const BitmapParams &src, const BitmapParams &dst);
+
     status_t convertYUVP010(
                 const BitmapParams &src, const BitmapParams &dst);
 
