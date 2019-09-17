@@ -3304,9 +3304,10 @@ status_t ACodec::setSupportedOutputFormat(bool getLegacyFlexibleFormat) {
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar
                 || format.eColorFormat == OMX_COLOR_FormatYUV420PackedSemiPlanar
                 || format.eColorFormat == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
-                || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar8x128Tiled
+                || format.eColorFormat == OMX_COLOR_FormatYCbYCr
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar8x4Tiled
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar4x4Tiled
+                || format.eColorFormat == OMX_COLOR_Format16bitRGB565
                 || format.eColorFormat == OMX_COLOR_FormatYUV420SemiPlanar4x4TiledCompressed) {
             break;
         }
