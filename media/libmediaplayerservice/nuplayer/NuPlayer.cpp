@@ -210,6 +210,7 @@ NuPlayer::NuPlayer(pid_t pid, const sp<MediaClock> &mediaClock)
       mDataSourceType(DATA_SOURCE_TYPE_NONE) {
     CHECK(mediaClock != NULL);
     clearFlushComplete();
+    mRendering = false;
 }
 
 NuPlayer::~NuPlayer() {
@@ -1320,6 +1321,7 @@ void NuPlayer::onMessageReceived(const sp<AMessage> &msg) {
             } else if (what == Renderer::kWhatMediaRenderingStart) {
                 ALOGV("media rendering started");
                 notifyListener(MEDIA_STARTED, 0, 0);
+                mRendering = true;
             } else if (what == Renderer::kWhatAudioTearDown) {
                 int32_t reason;
                 CHECK(msg->findInt32("reason", &reason));
@@ -2357,6 +2359,7 @@ void NuPlayer::performSeek(int64_t seekTimeUs, MediaPlayerSeekMode mode) {
     ++mTimedTextGeneration;
 
     // everything's flushed, continue playback.
+    mRendering = false;
 }
 
 void NuPlayer::performDecoderFlush(FlushCommand audio, FlushCommand video) {
@@ -2418,7 +2421,7 @@ void NuPlayer::performReset() {
     mPrepared = false;
     mResetting = false;
     mSourceStarted = false;
-
+    mRendering = false;
     // Modular DRM
     if (mCrypto != NULL) {
         // decoders will be flushed before this so their mCrypto would go away on their own
@@ -2648,7 +2651,7 @@ void NuPlayer::onSourceNotify(const sp<AMessage> &msg) {
         case Source::kWhatResumeOnBufferingEnd:
         {
             // ignore if not playing
-            if (mStarted) {
+            if (mStarted && mRendering) {
                 ALOGI("buffer ready, resuming...");
 
                 updateRebufferingTimer(true /* stopping */, false /* exiting */);
