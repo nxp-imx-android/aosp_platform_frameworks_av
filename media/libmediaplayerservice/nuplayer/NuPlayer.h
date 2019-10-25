@@ -250,7 +250,7 @@ private:
 
     // Pause state as requested by source (internally) due to buffering
     bool mPausedForBuffering;
-
+    bool mRendering;
     // Modular DRM
     sp<ICrypto> mCrypto;
     bool mIsDrmProtected;
