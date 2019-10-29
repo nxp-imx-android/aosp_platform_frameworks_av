@@ -489,10 +489,14 @@ void NuPlayer::GenericSource::onPrepareAsync() {
     uint32_t extractor_flags = mExtractor->flags();
     if(extractor_flags & MediaExtractor::CAN_SEEK)
         flags |= FLAG_CAN_SEEK;
-    if(extractor_flags & MediaExtractor::CAN_SEEK_FORWARD)
+    if(extractor_flags & MediaExtractor::CAN_SEEK_FORWARD){
+        flags |= FLAG_CAN_SEEK;
         flags |= FLAG_CAN_SEEK_FORWARD;
-    if(extractor_flags & MediaExtractor::CAN_SEEK_BACKWARD)
+    }
+    if(extractor_flags & MediaExtractor::CAN_SEEK_BACKWARD){
+        flags |= FLAG_CAN_SEEK;
         flags |= FLAG_CAN_SEEK_BACKWARD;
+    }
 
     ALOGV("flags %x", flags);
     notifyFlagsChanged(flags);
