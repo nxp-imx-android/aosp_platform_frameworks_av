@@ -238,6 +238,8 @@ enum {
     kKeyOpaqueCSD2       = 'csd2',
 
     kKeyHapticChannelCount = 'hapC',
+
+    kKeySubFormat         = 'sFmt', // (int32_t)
 };
 
 enum {
