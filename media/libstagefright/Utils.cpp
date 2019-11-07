@@ -903,6 +903,11 @@ status_t convertMetaDataToMessage(
 
     convertMetaDataToMessageFromMappings(meta, msg);
 
+    int32_t subFormat;
+    if (meta->findInt32(kKeySubFormat, &subFormat)) {
+        msg->setInt32("vendor.sub-format.value", subFormat);
+    }
+
     uint32_t type;
     const void *data;
     size_t size;
@@ -1670,6 +1675,11 @@ void convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
         meta->setCString(kKeyMIMEType, mime.c_str());
     } else {
         ALOGW("did not find mime type");
+    }
+
+    int32_t subFormat;
+    if (msg->findInt32("vendor.sub-format.value", &subFormat)) {
+        meta->setInt32(kKeySubFormat, subFormat);
     }
 
     convertMessageToMetaDataFromMappings(msg, meta);
