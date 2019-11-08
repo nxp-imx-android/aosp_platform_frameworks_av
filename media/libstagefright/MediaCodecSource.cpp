@@ -462,15 +462,19 @@ MediaCodecSource::MediaCodecSource(
     if (!(mFlags & FLAG_USE_SURFACE_INPUT)) {
         mPuller = new Puller(source);
     }
+    else
+        mPuller = NULL;
 }
 
 MediaCodecSource::~MediaCodecSource() {
     releaseEncoder();
 
-    MediaBufferBase* mbuf = NULL;
-    while(mPuller->readBuffer(&mbuf)){
-        if (!mIsVideo && mbuf != NULL) {
-            mbuf->release();
+    if (mPuller != NULL) {
+        MediaBufferBase* mbuf = NULL;
+        while(mPuller->readBuffer(&mbuf)){
+            if (!mIsVideo && mbuf != NULL) {
+                mbuf->release();
+            }
         }
     }
 
