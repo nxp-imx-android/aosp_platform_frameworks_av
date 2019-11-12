@@ -240,6 +240,7 @@ enum {
     kKeyHapticChannelCount = 'hapC',
 
     kKeySubFormat         = 'sFmt', // (int32_t)
+    kKeyBitsPerFrame     = 'bpfm',  // (int32_t)
 };
 
 enum {

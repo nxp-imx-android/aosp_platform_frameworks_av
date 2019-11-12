@@ -1040,6 +1040,11 @@ status_t convertMetaDataToMessage(
         if (meta->findInt32(kKeyHapticChannelCount, &hapticChannelCount)) {
             msg->setInt32("haptic-channel-count", hapticChannelCount);
         }
+
+        int32_t bitsPerFrame;
+        if (meta->findInt32(kKeyBitsPerFrame, &bitsPerFrame)) {
+            msg->setInt32("vendor.bits-per-frame.value", bitsPerFrame);
+        }
     }
 
     int32_t maxInputSize;
@@ -1793,6 +1798,10 @@ void convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
         int32_t hapticChannelCount;
         if (msg->findInt32("haptic-channel-count", &hapticChannelCount)) {
             meta->setInt32(kKeyHapticChannelCount, hapticChannelCount);
+        }
+        int32_t bitsPerFrame;
+        if (msg->findInt32("vendor.bits-per-frame.value", &bitsPerFrame)) {
+            meta->setInt32(kKeyBitsPerFrame, bitsPerFrame);
         }
     }
 
