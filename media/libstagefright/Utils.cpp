@@ -1041,6 +1041,11 @@ status_t convertMetaDataToMessage(
             msg->setInt32("haptic-channel-count", hapticChannelCount);
         }
 
+        int32_t audioBlockAlign;
+        if (meta->findInt32(kKeyAudioBlockAlign, &audioBlockAlign)) {
+            msg->setInt32("vendor.audio-block-align.value", audioBlockAlign);
+        }
+
         int32_t bitsPerFrame;
         if (meta->findInt32(kKeyBitsPerFrame, &bitsPerFrame)) {
             msg->setInt32("vendor.bits-per-frame.value", bitsPerFrame);
@@ -1799,6 +1804,12 @@ void convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
         if (msg->findInt32("haptic-channel-count", &hapticChannelCount)) {
             meta->setInt32(kKeyHapticChannelCount, hapticChannelCount);
         }
+
+        int32_t audioBlockAlign;
+        if (msg->findInt32("vendor.audio-block-align.value", &audioBlockAlign)) {
+            meta->setInt32(kKeyAudioBlockAlign, audioBlockAlign);
+        }
+
         int32_t bitsPerFrame;
         if (msg->findInt32("vendor.bits-per-frame.value", &bitsPerFrame)) {
             meta->setInt32(kKeyBitsPerFrame, bitsPerFrame);
