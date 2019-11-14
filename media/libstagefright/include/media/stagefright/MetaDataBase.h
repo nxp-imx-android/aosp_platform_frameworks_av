@@ -239,8 +239,13 @@ enum {
 
     kKeyHapticChannelCount = 'hapC',
 
+    kKeyIsADIF            = 'adif',  // bool (int32_t)
     kKeySubFormat         = 'sFmt', // (int32_t)
-    kKeyBitsPerFrame     = 'bpfm',  // (int32_t)
+    kKeyCodecData         = 'cCdd', // raw data
+    kKeyBitPerSample      = 'bPsp', // (int32_t)
+    kKeyAudioBlockAlign   = 'aBan', // (int32_t)
+    kKeyBitsPerFrame      = 'bPfm',
+    kKeySpecialThumbnail  = 'sThb',//int32_t
 };
 
 enum {
