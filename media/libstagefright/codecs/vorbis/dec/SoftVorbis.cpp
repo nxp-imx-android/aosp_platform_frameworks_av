@@ -576,7 +576,7 @@ void SoftVorbis::onPortFlushCompleted(OMX_U32 portIndex) {
         // Make sure that the next buffer output does not still
         // depend on fragments from the last one decoded.
 
-        mInputBufferCount = 0;
+        //mInputBufferCount = 0;
         mNumFramesOutput = 0;
         mSawInputEos = false;
         mSignalledOutputEos = false;
