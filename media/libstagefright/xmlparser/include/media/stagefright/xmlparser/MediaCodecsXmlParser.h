@@ -38,6 +38,21 @@ public:
             return { "/odm/etc", "/vendor/etc", "/etc" };
     }
     static std::vector<std::string> getDefaultXmlNames() {
+        FILE *f = fopen("/sys/devices/soc0/soc_id", "r");
+        if(f != NULL){
+            char inputBuf[20];
+            if(fgets(inputBuf, sizeof(inputBuf), f) != NULL){
+                if(!strncmp(inputBuf, "i.MX8QM", 7)){
+                    fclose(f);
+                    return { "media_codecs_8qm.xml", "media_codecs_performance.xml" };
+                }else if(!strncmp(inputBuf, "i.MX8QXP", 8)){
+                    fclose(f);
+                    return { "media_codecs_8qxp.xml", "media_codecs_performance.xml" };
+                }
+            }
+            fclose(f);
+        }
+
             return { "media_codecs.xml", "media_codecs_performance.xml" };
     }
     static constexpr char const* defaultProfilingResultsXmlPath =
