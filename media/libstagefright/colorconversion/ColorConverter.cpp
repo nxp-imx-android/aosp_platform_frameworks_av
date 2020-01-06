@@ -148,6 +148,7 @@ ColorConverter::BitmapParams::BitmapParams(
     case OMX_COLOR_Format16bitRGB565:
     case OMX_COLOR_FormatYUV420Planar16:
     case OMX_COLOR_FormatCbYCrY:
+    case OMX_COLOR_FormatYCbYCr:
         mBpp = 2;
         mStride = 2 * mWidth;
         break;

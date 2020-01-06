@@ -591,7 +591,7 @@ void CCodecConfig::initializeStandardParams() {
     // Pixel Format (use local key for actual pixel format as we don't distinguish between
     // SDK layouts for flexible format and we need the actual SDK color format in the media format)
     add(ConfigMapper("android._color-format",  C2_PARAMKEY_PIXEL_FORMAT, "value")
-        .limitTo((D::VIDEO | D::IMAGE) & D::RAW)
+        .limitTo((D::VIDEO | D::IMAGE) & (D::OUTPUT | D::RAW))
         .withMappers([](C2Value v) -> C2Value {
             int32_t value;
             if (v.get(&value)) {
@@ -605,6 +605,8 @@ void CCodecConfig::initializeStandardParams() {
                     case COLOR_FormatYUV420PackedPlanar:
                     case COLOR_FormatYUV420PackedSemiPlanar:
                         return (uint32_t)HAL_PIXEL_FORMAT_YV12;
+                    case COLOR_FormatYCbYCr:
+                        return HAL_PIXEL_FORMAT_YCbCr_422_I; //PixelFormat3::YCBCR_422_I (0x14)
                     default:
                         // TODO: support some sort of passthrough
                         break;
@@ -620,6 +622,8 @@ void CCodecConfig::initializeStandardParams() {
                     case HAL_PIXEL_FORMAT_YV12:
                     case HAL_PIXEL_FORMAT_YCBCR_420_888:
                         return COLOR_FormatYUV420Flexible;
+                    case HAL_PIXEL_FORMAT_YCbCr_422_I://PixelFormat3::YCBCR_422_I  (0x14)
+                        return COLOR_FormatYCbYCr;
                     default:
                         // TODO: support some sort of passthrough
                         break;
