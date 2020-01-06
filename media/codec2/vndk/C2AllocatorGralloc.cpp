@@ -689,6 +689,117 @@ c2_status_t C2AllocationGralloc::map(
             break;
         }
 
+        case PixelFormat3::YCBCR_422_I:
+        {
+            struct YCbCrLayout {
+                void* y;
+                void* cb;
+                void* cr;
+                uint32_t yStride;
+                uint32_t cStride;
+                uint32_t chromaStep;
+            };
+            YCbCrLayout ycbcrLayout;
+            if (mMapper2) {
+                if (!mMapper2->lockYCbCr(
+                        const_cast<native_handle_t *>(mBuffer), grallocUsage,
+                        { (int32_t)rect.left, (int32_t)rect.top,
+                          (int32_t)rect.width, (int32_t)rect.height },
+                        // TODO: fence
+                        hidl_handle(),
+                        [&err, &ycbcrLayout](const auto &maperr, const auto &mapLayout) {
+                            err = maperr2error(maperr);
+                            if (err == C2_OK) {
+                                ycbcrLayout = YCbCrLayout{
+                                        mapLayout.y,
+                                        mapLayout.cb,
+                                        mapLayout.cr,
+                                        mapLayout.yStride,
+                                        mapLayout.cStride,
+                                        mapLayout.chromaStep};
+                            }
+                        }).isOk()) {
+                    ALOGE("failed transaction: lockYCbCr YCBCR_422_I");
+                    return C2_CORRUPTED;
+                }
+            } else {
+                if (!mMapper3->lockYCbCr(
+                        const_cast<native_handle_t *>(mBuffer), grallocUsage,
+                        { (int32_t)rect.left, (int32_t)rect.top,
+                          (int32_t)rect.width, (int32_t)rect.height },
+                        // TODO: fence
+                        hidl_handle(),
+                        [&err, &ycbcrLayout](const auto &maperr, const auto &mapLayout) {
+                            err = maperr2error(maperr);
+                            if (err == C2_OK) {
+                                ycbcrLayout = YCbCrLayout{
+                                        mapLayout.y,
+                                        mapLayout.cb,
+                                        mapLayout.cr,
+                                        mapLayout.yStride,
+                                        mapLayout.cStride,
+                                        mapLayout.chromaStep};
+                            }
+                        }).isOk()) {
+                    ALOGE("failed transaction: lockYCbCr (@3.0) YCBCR_422_I");
+                    return C2_CORRUPTED;
+                }
+            }
+
+            if (err != C2_OK) {
+                ALOGE("lockYCbCr YCBCR_422_I failed: %d", err);
+                return err;
+            }
+
+            addr[C2PlanarLayout::PLANE_Y] = (uint8_t *)ycbcrLayout.y;
+            addr[C2PlanarLayout::PLANE_U] = (uint8_t *)ycbcrLayout.cb;
+            addr[C2PlanarLayout::PLANE_V] = (uint8_t *)ycbcrLayout.cr;
+            layout->type = C2PlanarLayout::TYPE_YUV;
+            layout->numPlanes = 1;
+            layout->rootPlanes = 1;
+            layout->planes[C2PlanarLayout::PLANE_Y] = {
+                C2PlaneInfo::CHANNEL_Y,         // channel
+                (int32_t)ycbcrLayout.chromaStep,// colInc
+                (int32_t)ycbcrLayout.yStride,   // rowInc
+                1,                              // mColSampling
+                1,                              // mRowSampling
+                8,                              // allocatedDepth
+                8,                              // bitDepth
+                0,                              // rightShift
+                C2PlaneInfo::NATIVE,            // endianness
+                C2PlanarLayout::PLANE_Y,        // rootIx
+                0,                              // offset
+            };
+            layout->planes[C2PlanarLayout::PLANE_U] = {
+                C2PlaneInfo::CHANNEL_CB,          // channel
+                (int32_t)ycbcrLayout.chromaStep,  // colInc
+                (int32_t)ycbcrLayout.cStride,     // rowInc
+                2,                                // mColSampling
+                2,                                // mRowSampling
+                8,                                // allocatedDepth
+                8,                                // bitDepth
+                0,                                // rightShift
+                C2PlaneInfo::NATIVE,              // endianness
+                C2PlanarLayout::PLANE_U,          // rootIx
+                0,                                // offset
+            };
+            layout->planes[C2PlanarLayout::PLANE_V] = {
+                C2PlaneInfo::CHANNEL_CR,          // channel
+                (int32_t)ycbcrLayout.chromaStep,  // colInc
+                (int32_t)ycbcrLayout.cStride,     // rowInc
+                2,                                // mColSampling
+                2,                                // mRowSampling
+                8,                                // allocatedDepth
+                8,                                // bitDepth
+                0,                                // rightShift
+                C2PlaneInfo::NATIVE,              // endianness
+                C2PlanarLayout::PLANE_V,          // rootIx
+                0,                                // offset
+            };
+            ALOGV("lockYCbCr YCBCR_422_I success yStride=%d",ycbcrLayout.yStride);
+            break;
+        }
+
         case PixelFormat3::YCBCR_420_888:
             // fall-through
         case PixelFormat3::YV12:
