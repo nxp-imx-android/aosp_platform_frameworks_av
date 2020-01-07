@@ -415,6 +415,8 @@ C2AllocationIon::Impl *C2AllocationIon::Impl::Alloc(int ionFd, size_t size, size
     size_t alignedSize = align == 0 ? size : (size + align - 1) & ~(align - 1);
     int ret;
 
+    flags |= ION_FLAG_CACHED;
+
     if (ion_is_legacy(ionFd)) {
         ret = ion_alloc(ionFd, alignedSize, align, heapMask, flags, &buffer);
         ALOGV("ion_alloc(ionFd = %d, size = %zu, align = %zu, prot = %d, flags = %d) "
