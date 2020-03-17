@@ -1006,6 +1006,9 @@ status_t convertMetaDataToMessage(
         if (meta->findInt32(kKeyBitsPerSample, &bitsPerSample)) {
             msg->setInt32("bits-per-sample", bitsPerSample);
         }
+        if (meta->findInt32(kKeyVendorBitsPerSample, &bitsPerSample)) {
+            msg->setInt32("vendor.bits-per-sample.value", bitsPerSample);
+        }
 
         int32_t channelMask;
         if (meta->findInt32(kKeyChannelMask, &channelMask)) {
@@ -1771,6 +1774,9 @@ void convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
         int32_t bitsPerSample;
         if (msg->findInt32("bits-per-sample", &bitsPerSample)) {
             meta->setInt32(kKeyBitsPerSample, bitsPerSample);
+        }
+        if (msg->findInt32("vendor.bits-per-sample.value", &bitsPerSample)) {
+            meta->setInt32(kKeyVendorBitsPerSample, bitsPerSample);
         }
         int32_t channelMask;
         if (msg->findInt32("channel-mask", &channelMask)) {
