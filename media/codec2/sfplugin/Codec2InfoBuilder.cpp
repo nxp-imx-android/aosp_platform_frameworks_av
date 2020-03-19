@@ -315,6 +315,7 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
     // Note: Currently, OMX components have default rank 0x100, while all
     // Codec2.0 software components have default rank 0x200.
     int option = ::android::base::GetIntProperty("debug.stagefright.ccodec", 4);
+    bool specific_xml = false;
 
     // Obtain Codec2Client
     std::vector<Traits> traits = Codec2Client::ListComponents();
@@ -325,9 +326,30 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
             parser.getDefaultXmlNames(),
             { "/apex/com.android.media.swcodec/etc" });
 
-    // TODO: remove these c2-specific files once product moved to default file names
-    parser.parseXmlFilesInSearchDirs(
-            { "media_codecs_c2.xml", "media_codecs_performance_c2.xml" });
+    {
+        FILE *f = fopen("/sys/devices/soc0/soc_id", "r");
+        if(f != NULL){
+            char inputBuf[20];
+            if(fgets(inputBuf, sizeof(inputBuf), f) != NULL){
+                if(!strncmp(inputBuf, "i.MX8QM", 7)){
+                    specific_xml = true;
+                    parser.parseXmlFilesInSearchDirs(
+                            { "media_codecs_8qm.xml", "media_codecs_performance_c2.xml" });
+                }else if(!strncmp(inputBuf, "i.MX8QXP", 8)){
+                    specific_xml = true;
+                    parser.parseXmlFilesInSearchDirs(
+                            { "media_codecs_8qxp.xml", "media_codecs_performance_c2.xml" });
+                }
+            }
+            fclose(f);
+        }
+    }
+
+    if(!specific_xml){
+        // TODO: remove these c2-specific files once product moved to default file names
+        parser.parseXmlFilesInSearchDirs(
+                { "media_codecs_c2.xml", "media_codecs_performance_c2.xml" });
+    }
 
     // parse default XML files
     parser.parseXmlFilesInSearchDirs();
