@@ -1554,6 +1554,7 @@ void CCodecBufferChannel::sendOutputBuffers() {
     ReorderStash::Entry entry;
     sp<MediaCodecBuffer> outBuffer;
     size_t index;
+    bool canRetrySend = true;
 
     while (true) {
         Mutexed<ReorderStash>::Locked reorder(mReorderStash);
@@ -1584,6 +1585,12 @@ void CCodecBufferChannel::sendOutputBuffers() {
 
             if (outputBuffersChanged) {
                 mCCodecCallback->onOutputBuffersChanged();
+                if(canRetrySend){
+                    ALOGV("retry sending after realloc");
+                    // use this flag to make sure retrying just once,to avoid dead loop
+                    canRetrySend = false;
+                    continue;
+                }
             }
             return;
         }
