@@ -247,7 +247,8 @@ status_t NuPlayer::RTSPSource::dequeueAccessUnit(
             if (!sourceNearEOS(!audio)) {
                 // We should not enter buffering mode
                 // if any of the sources already have detected EOS.
-                startBufferingIfNecessary();
+                if(!audio)
+                    startBufferingIfNecessary();
             }
 
             return -EWOULDBLOCK;
@@ -370,7 +371,8 @@ void NuPlayer::RTSPSource::checkBuffering(
         } else {
             // TODO: redefine kUnderflowMarkMs to a fair value,
             if (bufferedDurationUs < kUnderflowMarkMs * 1000) {
-                ++underflowCount;
+                if(src != mAudioTrack)
+                    ++underflowCount;
             }
             if (bufferedDurationUs > maxRebufferingMarkUs) {
                 ++overflowCount;
