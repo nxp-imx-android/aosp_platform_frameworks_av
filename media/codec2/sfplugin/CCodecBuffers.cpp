@@ -24,7 +24,7 @@
 #include <media/stagefright/MediaCodecConstants.h>
 
 #include "CCodecBuffers.h"
-
+#include <media/stagefright/graphics_ext.h>
 namespace android {
 
 namespace {
@@ -734,7 +734,15 @@ GraphicInputBuffers::GraphicInputBuffers(
     : InputBuffers(componentName, name),
       mImpl(mName),
       mLocalBufferPool(LocalBufferPool::Create(
-              kMaxLinearBufferSize * numInputSlots)) { }
+              kMaxLinearBufferSize * numInputSlots)),
+      mUseNV12(false)
+{
+#ifdef MALONE_VPU
+    if(!strncmp("c2.imx.", mName, 7)){
+        mUseNV12 = true;
+    }
+#endif
+}
 
 bool GraphicInputBuffers::requestNewBuffer(size_t *index, sp<MediaCodecBuffer> *buffer) {
     sp<Codec2Buffer> newBuffer = createNewBuffer();
@@ -772,10 +780,13 @@ std::unique_ptr<InputBuffers> GraphicInputBuffers::toArrayMode(size_t size) {
     array->initialize(
             mImpl,
             size,
-            [pool = mPool, format = mFormat, lbp = mLocalBufferPool]() -> sp<Codec2Buffer> {
+            [pool = mPool, format = mFormat, lbp = mLocalBufferPool, useNV12 = mUseNV12]() -> sp<Codec2Buffer> {
                 C2MemoryUsage usage = { C2MemoryUsage::CPU_READ, C2MemoryUsage::CPU_WRITE };
+                uint32_t pixelFormat = HAL_PIXEL_FORMAT_YV12;
+                if(useNV12)
+                    pixelFormat = HAL_PIXEL_FORMAT_YCbCr_420_SP;
                 return AllocateGraphicBuffer(
-                        pool, format, HAL_PIXEL_FORMAT_YV12, usage, lbp);
+                        pool, format, pixelFormat, usage, lbp);
             });
     return std::move(array);
 }
@@ -787,8 +798,12 @@ size_t GraphicInputBuffers::numClientBuffers() const {
 sp<Codec2Buffer> GraphicInputBuffers::createNewBuffer() {
     // TODO: read usage from intf
     C2MemoryUsage usage = { C2MemoryUsage::CPU_READ, C2MemoryUsage::CPU_WRITE };
+    uint32_t pixelFormat = HAL_PIXEL_FORMAT_YV12;
+    if(mUseNV12)
+        pixelFormat = HAL_PIXEL_FORMAT_YCbCr_420_SP;
+
     return AllocateGraphicBuffer(
-            mPool, mFormat, HAL_PIXEL_FORMAT_YV12, usage, mLocalBufferPool);
+            mPool, mFormat, pixelFormat, usage, mLocalBufferPool);
 }
 
 // OutputBuffersArray
