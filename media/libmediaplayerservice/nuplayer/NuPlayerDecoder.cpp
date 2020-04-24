@@ -331,6 +331,11 @@ void NuPlayer::Decoder::onConfigure(const sp<AMessage> &format) {
             ALOGI("use tile format by property");
         }
 #ifdef MALONE_VPU
+        else{
+            format->setInt32("vendor.hal-pixel-format.value", 0x14);//HAL_PIXEL_FORMAT_YCbCr_422_I
+            ALOGI("enable YUYV format");
+        }
+
         AString consumer_name;
         int32_t input_width = 0;
         if(mSurface != NULL)
