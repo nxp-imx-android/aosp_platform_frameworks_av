@@ -582,7 +582,7 @@ const char *MPEG4Writer::Track::getFourCCForMime(const char *mime) {
         } else if (!strcasecmp(MEDIA_MIMETYPE_AUDIO_AMR_WB, mime)) {
             return "sawb";
         } else if (!strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC, mime)
-                    || !strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC_FSL, mime)) {
+                    || !strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC_EXT, mime)) {
             return "mp4a";
         }
     } else if (!strncasecmp(mime, "video/", 6)) {
@@ -1831,7 +1831,7 @@ MPEG4Writer::Track::Track(
     mIsHeic = !strcasecmp(mime, MEDIA_MIMETYPE_IMAGE_ANDROID_HEIC);
     mIsMPEG4 = !strcasecmp(mime, MEDIA_MIMETYPE_VIDEO_MPEG4) ||
                !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC) ||
-               !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC_FSL);
+               !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC_EXT);
 
     // store temporal layer count
     if (mIsVideo) {
@@ -2217,7 +2217,7 @@ void MPEG4Writer::Track::getCodecSpecificDataFromInputFormatIfPossible() {
         mMeta->findData(kKeyHVCC, &type, &data, &size);
     } else if (!strcasecmp(mime, MEDIA_MIMETYPE_VIDEO_MPEG4)
             || !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC)
-            || !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC_FSL)) {
+            || !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC_EXT)) {
         if (mMeta->findData(kKeyESDS, &type, &data, &size)) {
             ESDS esds(data, size);
             if (esds.getCodecSpecificInfo(&data, &size) == OK &&
@@ -3662,7 +3662,7 @@ status_t MPEG4Writer::Track::checkCodecSpecificData() const {
     const char *mime;
     CHECK(mMeta->findCString(kKeyMIMEType, &mime));
     if (!strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC, mime) ||
-        !strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC_FSL, mime) ||
+        !strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC_EXT, mime) ||
         !strcasecmp(MEDIA_MIMETYPE_VIDEO_MPEG4, mime) ||
         !strcasecmp(MEDIA_MIMETYPE_VIDEO_AVC, mime) ||
         !strcasecmp(MEDIA_MIMETYPE_VIDEO_HEVC, mime) ||
@@ -3884,7 +3884,7 @@ void MPEG4Writer::Track::writeAudioFourCCBox() {
     CHECK(success);
     mOwner->writeInt32(samplerate << 16);
     if (!strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC, mime)
-        || !strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC_FSL, mime)) {
+        || !strcasecmp(MEDIA_MIMETYPE_AUDIO_AAC_EXT, mime)) {
         writeMp4aEsdsBox();
     } else if (!strcasecmp(MEDIA_MIMETYPE_AUDIO_AMR_NB, mime) ||
                !strcasecmp(MEDIA_MIMETYPE_AUDIO_AMR_WB, mime)) {

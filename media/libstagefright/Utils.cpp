@@ -49,7 +49,7 @@
 
 namespace android {
 
-const char *MEDIA_MIMETYPE_AUDIO_AAC_FSL = "audio/aac-fsl";
+const char *MEDIA_MIMETYPE_AUDIO_AAC_EXT = "audio/x-mp4a-latm";
 
 static status_t copyNALUToABuffer(sp<ABuffer> *buffer, const uint8_t *ptr, size_t length) {
     if (((*buffer)->size() + 4 + length) > ((*buffer)->capacity() - (*buffer)->offset())) {
@@ -1349,7 +1349,7 @@ status_t convertMetaDataToMessage(
                 parseMpeg2ProfileLevelFromHeader((uint8_t*)data, size, msg);
             }
         } else if (!strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC)
-                    || !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC_FSL)) {
+                    || !strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC_EXT)) {
             parseAacProfileFromCsd(buffer, msg);
         }
 
@@ -1862,7 +1862,7 @@ void convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
                 meta->setData(kKeyAVCC, kTypeAVCC, avcc.data(), outsize);
             }
         } else if (mime == MEDIA_MIMETYPE_AUDIO_AAC ||
-                mime == MEDIA_MIMETYPE_AUDIO_AAC_FSL ||
+                mime == MEDIA_MIMETYPE_AUDIO_AAC_EXT ||
                 mime == MEDIA_MIMETYPE_VIDEO_MPEG4 ||
                 mime == MEDIA_MIMETYPE_AUDIO_WMA ||
                 mime == MEDIA_MIMETYPE_AUDIO_MS_ADPCM ||
@@ -1997,7 +1997,7 @@ static const struct mime_conv_t mimeLookup[] = {
     { MEDIA_MIMETYPE_AUDIO_AMR_NB,      AUDIO_FORMAT_AMR_NB },
     { MEDIA_MIMETYPE_AUDIO_AMR_WB,      AUDIO_FORMAT_AMR_WB },
     { MEDIA_MIMETYPE_AUDIO_AAC,         AUDIO_FORMAT_AAC },
-    { MEDIA_MIMETYPE_AUDIO_AAC_FSL,     AUDIO_FORMAT_AAC },
+    { MEDIA_MIMETYPE_AUDIO_AAC_EXT,     AUDIO_FORMAT_AAC },
     { MEDIA_MIMETYPE_AUDIO_VORBIS,      AUDIO_FORMAT_VORBIS },
     { MEDIA_MIMETYPE_AUDIO_OPUS,        AUDIO_FORMAT_OPUS},
     { MEDIA_MIMETYPE_AUDIO_AC3,         AUDIO_FORMAT_AC3},

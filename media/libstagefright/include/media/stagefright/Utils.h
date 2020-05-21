@@ -87,7 +87,7 @@ void readFromAMessage(const sp<AMessage> &msg, BufferingSettings *buffering /* n
 
 AString nameForFd(int fd);
 
-extern const char *MEDIA_MIMETYPE_AUDIO_AAC_FSL;
+extern const char *MEDIA_MIMETYPE_AUDIO_AAC_EXT;
 }  // namespace android
 
 #endif  // UTILS_H_
