@@ -43,6 +43,8 @@
 #include <media/stagefright/Utils.h>
 #include "../../libstagefright/include/NuCachedSource2.h"
 #include "../../libstagefright/include/HTTPBase.h"
+#include <inttypes.h>
+#include "StreamingDataSource.h"
 
 namespace android {
 
@@ -170,15 +172,22 @@ sp<MetaData> NuPlayer::GenericSource::getFileFormatMeta() const {
 status_t NuPlayer::GenericSource::initFromDataSource() {
     sp<IMediaExtractor> extractor;
     sp<DataSource> dataSource;
+    String8 mimeType;
     {
         Mutex::Autolock _l_d(mDisconnectLock);
         dataSource = mDataSource;
     }
     CHECK(dataSource != NULL);
+    const char* uri = mUri.c_str();
+    if (!strncasecmp("rtp://", uri, 6)
+       || !strncasecmp("udp://", uri, 6))
+    {
+        mimeType = MEDIA_MIMETYPE_CONTAINER_MPEG2TS;
+    }
 
     mLock.unlock();
     // This might take long time if data source is not reliable.
-    extractor = MediaExtractorFactory::Create(dataSource, NULL);
+    extractor = MediaExtractorFactory::Create(dataSource, mimeType.isEmpty() ? NULL : mimeType.string());
 
     if (extractor == NULL) {
         ALOGE("initFromDataSource, cannot create extractor!");
@@ -370,6 +379,7 @@ void NuPlayer::GenericSource::prepareAsync() {
 }
 
 void NuPlayer::GenericSource::onPrepareAsync() {
+
     mDisconnectLock.lock();
     ALOGV("onPrepareAsync: mDataSource: %d", (mDataSource != NULL));
 
@@ -399,17 +409,32 @@ void NuPlayer::GenericSource::onPrepareAsync() {
                 }
             }
 
-            mLock.unlock();
-            mDisconnectLock.unlock();
-            // This might take long time if connection has some issue.
-            sp<DataSource> dataSource = DataSourceFactory::CreateFromURI(
-                   mHTTPService, uri, &mUriHeaders, &contentType,
-                   static_cast<HTTPBase *>(mHttpSource.get()));
-            mDisconnectLock.lock();
-            mLock.lock();
-            if (!mDisconnected) {
-                mDataSource = dataSource;
+            if (!strncasecmp("rtp://", uri, 6)
+                    || !strncasecmp("udp://", uri, 6)){
+                mLock.unlock();
+                mDisconnectLock.unlock();
+                sp<DataSource> dataSource = new StreamingDataSource(uri);
+                mDisconnectLock.lock();
+                mLock.lock();
+
+                if (!mDisconnected) {
+                    mDataSource = dataSource;
+                }
+            }else{
+                mLock.unlock();
+                mDisconnectLock.unlock();
+                // This might take long time if connection has some issue.
+                sp<DataSource> dataSource = DataSourceFactory::CreateFromURI(
+                       mHTTPService, uri, &mUriHeaders, &contentType,
+                       static_cast<HTTPBase *>(mHttpSource.get()));
+                mDisconnectLock.lock();
+                mLock.lock();
+
+                if (!mDisconnected) {
+                    mDataSource = dataSource;
+                }
             }
+
         } else {
             if (property_get_bool("media.stagefright.extractremote", true) &&
                     !FileSource::requiresDrm(mFd, mOffset, mLength, nullptr /* mime */)) {
