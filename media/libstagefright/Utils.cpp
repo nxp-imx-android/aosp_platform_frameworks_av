@@ -847,6 +847,11 @@ status_t convertMetaDataToMessage(
         msg->setInt32("vendor.sub-format.value", subFormat);
     }
 
+    int32_t lowLatency;
+    if (meta->findInt32(kKeyLowLatency, &lowLatency)) {
+        msg->setInt32("vendor.low-latency.value", lowLatency);
+    }
+
     uint32_t type;
     const void *data;
     size_t size;
@@ -1633,6 +1638,11 @@ void convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
     int32_t subFormat;
     if (msg->findInt32("vendor.sub-format.value", &subFormat)) {
         meta->setInt32(kKeySubFormat, subFormat);
+    }
+
+    int32_t lowLatency;
+    if (msg->findInt32("vendor.low-latency.value", &lowLatency)) {
+        meta->setInt32(kKeyLowLatency, lowLatency);
     }
 
     convertMessageToMetaDataFromMappings(msg, meta);
