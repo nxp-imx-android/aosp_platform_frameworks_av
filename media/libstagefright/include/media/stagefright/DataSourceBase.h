@@ -33,6 +33,7 @@ public:
         kIsCachingDataSource   = 4,
         kIsHTTPBasedSource     = 8,
         kIsLocalFileSource     = 16,
+        kIsLiveSource          = 32,
     };
 
     DataSourceBase() {}

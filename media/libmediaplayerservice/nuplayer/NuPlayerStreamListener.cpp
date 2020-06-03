@@ -34,7 +34,6 @@ NuPlayer::NuPlayerStreamListener::NuPlayerStreamListener(
       mTargetHandler(targetHandler),
       mEOS(false),
       mSendDataNotification(true) {
-    mSource->setListener(this);
 
     mMemoryDealer = new MemoryDealer(kNumBuffers * kBufferSize);
     for (size_t i = 0; i < kNumBuffers; ++i) {
@@ -47,6 +46,7 @@ NuPlayer::NuPlayerStreamListener::NuPlayerStreamListener(
 }
 
 void NuPlayer::NuPlayerStreamListener::start() {
+    mSource->setListener(this);
     for (size_t i = 0; i < kNumBuffers; ++i) {
         mSource->onBufferAvailable(i);
     }
