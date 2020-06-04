@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/* Copyright 2017 NXP */
 #ifndef UTILS_H_
 
 #define UTILS_H_
@@ -88,6 +88,7 @@ void readFromAMessage(const sp<AMessage> &msg, BufferingSettings *buffering /* n
 AString nameForFd(int fd);
 
 extern const char *MEDIA_MIMETYPE_AUDIO_AAC_EXT;
+bool canPassThrough(const sp<MetaData>& meta);
 }  // namespace android
 
 #endif  // UTILS_H_
