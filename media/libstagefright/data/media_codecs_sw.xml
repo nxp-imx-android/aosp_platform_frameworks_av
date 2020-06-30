@@ -169,7 +169,7 @@
             <Limit name="alignment" value="2x2" />
             <Limit name="block-size" value="16x16" />
             <Variant name="!slow-cpu">
-                <Limit name="size" min="2x2" max="1280x720" />
+                <Limit name="size" min="2x2" max="1920x1088" />
                 <Limit name="block-count" range="1-16384" />
                 <Limit name="blocks-per-second" range="1-500000" />
                 <Limit name="bitrate" range="1-40000000" />
