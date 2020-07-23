@@ -454,10 +454,11 @@ ALookup<uint32_t, int32_t> sPixelFormats = {
     { HAL_PIXEL_FORMAT_YV12,                   COLOR_FormatYUV420Flexible },
 
     { HAL_PIXEL_FORMAT_YCBCR_422_SP,           COLOR_FormatYUV422PackedSemiPlanar },
-    { HAL_PIXEL_FORMAT_YCBCR_422_I,            COLOR_FormatYUV422PackedPlanar },
     { HAL_PIXEL_FORMAT_YCBCR_P010,             COLOR_FormatYUVP010 },
     { HAL_PIXEL_FORMAT_RGBA_1010102,           COLOR_Format32bitABGR2101010 },
     { HAL_PIXEL_FORMAT_RGBA_FP16,              COLOR_Format64bitABGRFloat },
+
+    { HAL_PIXEL_FORMAT_YCbCr_422_I,            COLOR_FormatYCbYCr },
 };
 
 ALookup<C2Config::picture_type_t, int32_t> sPictureType = {

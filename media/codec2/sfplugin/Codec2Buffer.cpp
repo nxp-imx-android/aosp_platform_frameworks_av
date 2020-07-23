@@ -263,6 +263,18 @@ public:
         switch (layout.type) {
             case C2PlanarLayout::TYPE_YUV: {
                 mediaImage->mType = MediaImage2::MEDIA_IMAGE_TYPE_YUV;
+
+                //support one plane for YUYV format(COLOR_FormatYCbYCr)
+                if(1 == layout.numPlanes){
+                    stride *= 2;//update stride as twice frame width
+                    mediaImage->mPlane[mediaImage->Y].mOffset = 0;
+                    mediaImage->mPlane[mediaImage->Y].mColInc = 1;
+                    mediaImage->mPlane[mediaImage->Y].mRowInc = stride;
+                    mediaImage->mPlane[mediaImage->Y].mHorizSubsampling = 1;
+                    mediaImage->mPlane[mediaImage->Y].mVertSubsampling = 1;
+                    break;
+                }
+
                 if (layout.numPlanes != 3) {
                     ALOGD("Converter: %d planes for YUV layout", layout.numPlanes);
                     mInitCheck = BAD_VALUE;
