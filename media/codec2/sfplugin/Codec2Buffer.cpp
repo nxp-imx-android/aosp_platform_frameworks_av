@@ -837,6 +837,9 @@ sp<ConstGraphicBlockBuffer> ConstGraphicBlockBuffer::AllocateEmpty(
     }
     int32_t colorFormat = COLOR_FormatYUV420Flexible;
     int32_t bpp = 12;  // 8(Y) + 2(U) + 2(V)
+#ifdef MALONE_VPU
+    bpp = 16;
+#endif
     if (format->findInt32(KEY_COLOR_FORMAT, &colorFormat)) {
         if (colorFormat == COLOR_FormatYUVP010) {
             bpp = 24;  // 16(Y) + 4(U) + 4(V)
