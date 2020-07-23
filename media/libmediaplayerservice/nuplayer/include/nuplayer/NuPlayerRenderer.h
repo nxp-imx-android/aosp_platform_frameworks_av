@@ -82,7 +82,7 @@ struct NuPlayer::Renderer : public AHandler {
             bool *isOffloaded,
             bool isStreaming);
     void closeAudioSink();
-
+    void enableSyncQueue(bool bEnabled);
     // re-open audio sink after all pending audio buffers played.
     void changeAudioFormat(
             const sp<AMessage> &format,
@@ -135,6 +135,7 @@ private:
         kWhatDisableOffloadAudio = 'noOA',
         kWhatEnableOffloadAudio  = 'enOA',
         kWhatSetVideoFrameRate   = 'sVFR',
+        kWhatEnableSyncQueue     = 'eSyQ',
     };
 
     // if mBuffer != nullptr, it's a buffer containing real data.
@@ -302,7 +303,7 @@ private:
     void cancelAudioOffloadPauseTimeout();
 
     int64_t getDurationUsIfPlayedAtSampleRate(uint32_t numFrames);
-
+    void onEnableSyncQueue(int32_t enable);
     DISALLOW_EVIL_CONSTRUCTORS(Renderer);
 };
 
