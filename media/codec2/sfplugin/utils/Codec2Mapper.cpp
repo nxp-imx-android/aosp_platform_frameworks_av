@@ -967,6 +967,9 @@ bool C2Mapper::mapPixelFormatFrameworkToCodec(
         case COLOR_FormatYUV420PackedSemiPlanar:
             *c2Value = HAL_PIXEL_FORMAT_YCBCR_420_888;
             return true;
+        case COLOR_FormatYCbYCr:
+            *c2Value = HAL_PIXEL_FORMAT_YCbCr_422_I; //PixelFormat3::YCBCR_422_I (0x14)
+            return true;
         default:
             // Passthrough
             *c2Value = uint32_t(frameworkValue);
@@ -983,10 +986,12 @@ bool C2Mapper::mapPixelFormatCodecToFramework(
             return true;
         case HAL_PIXEL_FORMAT_YCBCR_422_SP:
         case HAL_PIXEL_FORMAT_YCRCB_420_SP:
-        case HAL_PIXEL_FORMAT_YCBCR_422_I:
         case HAL_PIXEL_FORMAT_YCBCR_420_888:
         case HAL_PIXEL_FORMAT_YV12:
             *frameworkValue = COLOR_FormatYUV420Flexible;
+            return true;
+        case HAL_PIXEL_FORMAT_YCbCr_422_I://PixelFormat3::YCBCR_422_I  (0x14)
+            *frameworkValue = COLOR_FormatYCbYCr;
             return true;
         default:
             // Passthrough
