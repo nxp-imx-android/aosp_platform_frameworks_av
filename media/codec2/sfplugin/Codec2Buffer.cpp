@@ -800,7 +800,12 @@ sp<ConstGraphicBlockBuffer> ConstGraphicBlockBuffer::AllocateEmpty(
         return nullptr;
     }
     // NOTE: we currently only support YUV420 formats for byte-buffer mode.
-    sp<ABuffer> aBuffer(alloc(align(width, 16) * align(height, 16) * 3 / 2));
+    #ifdef MALONE_VPU
+    sp<ABuffer> aBuffer(alloc(align(width, 16) * align(height, 16) * 2));
+    #else
+    sp<ABuffer> aBuffer(alloc(align(width, 16) * align(height, 16) * 3/2));
+    #endif
+
     return new ConstGraphicBlockBuffer(
             format,
             aBuffer,
