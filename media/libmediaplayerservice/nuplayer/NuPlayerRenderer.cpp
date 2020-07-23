@@ -516,6 +516,13 @@ void NuPlayer::Renderer::changeAudioFormat(
     msg->post();
 }
 
+void NuPlayer::Renderer::enableSyncQueue(bool bEnabled)
+{
+    sp<AMessage> msg = new AMessage(kWhatEnableSyncQueue, this);
+    msg->setInt32("enable", (bEnabled ? 1 : 0));
+    msg->post();
+}
+
 void NuPlayer::Renderer::onMessageReceived(const sp<AMessage> &msg) {
     switch (msg->what()) {
         case kWhatOpenAudioSink:
@@ -837,6 +844,14 @@ void NuPlayer::Renderer::onMessageReceived(const sp<AMessage> &msg) {
             }
             ALOGV("releasing audio offload pause wakelock.");
             mWakeLock->release();
+            break;
+        }
+
+        case kWhatEnableSyncQueue:
+        {
+            int32_t enable;
+            CHECK(msg->findInt32("enable", &enable));
+            onEnableSyncQueue(enable);
             break;
         }
 
@@ -2214,6 +2229,17 @@ void NuPlayer::Renderer::WakeLockEvent::dump(AString& logString) {
   logString.append(",");
   logString.append(mRendererTimeoutGeneration);
   logString.append("]");
+}
+
+
+void NuPlayer::Renderer::onEnableSyncQueue(int32_t enable)
+{
+    if(enable > 0)
+        mSyncQueues = true;
+    else
+        mSyncQueues = false;
+
+    ALOGV("onEnableSyncQueue %d",enable);
 }
 
 }  // namespace android
