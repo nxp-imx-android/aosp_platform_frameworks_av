@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright (C) 2016 Freescale Semiconductor, Inc. */
+/* Copyright 2017-2018 NXP */
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "GenericSource"
@@ -113,6 +115,7 @@ void NuPlayer::GenericSource::resetDataSource() {
     mIsDrmReleased = false;
     mIsSecure = false;
     mMimes.clear();
+    mTextTrackType = TextTrackType_3GPP;
 }
 
 status_t NuPlayer::GenericSource::setDataSource(
@@ -783,6 +786,12 @@ void NuPlayer::GenericSource::fetchTextData(
     int64_t timeUs;
     CHECK(msg->findInt64("timeUs", &timeUs));
 
+    int32_t textType = 0;
+    //do not seek when text type is srt
+    if(msg->findInt32("textTrackType", &textType) && textType > TextTrackType_3GPP)
+        timeUs = -1;
+
+
     int64_t subTimeUs = 0;
     readBuffer(type, timeUs, MediaPlayerSeekMode::SEEK_PREVIOUS_SYNC /* mode */, &subTimeUs);
 
@@ -794,8 +803,12 @@ void NuPlayer::GenericSource::fetchTextData(
     if (msg->what() == kWhatFetchSubtitleData) {
         subTimeUs -= 1000000LL;  // send subtile data one second earlier
     }
+    if(textType > TextTrackType_3GPP)
+        subTimeUs = 0;
+
     sp<AMessage> msg2 = new AMessage(sendWhat, this);
     msg2->setInt32("generation", msgGeneration);
+    msg2->setInt32("textTrackType", textType);
     mMediaClock->addTimer(msg2, subTimeUs);
 }
 
@@ -817,6 +830,9 @@ void NuPlayer::GenericSource::sendTextData(
         return;
     }
 
+    int32_t textType = 0;
+    msg->findInt32("textTrackType", &textType);
+
     int64_t nextSubTimeUs;
     readBuffer(type, -1, MediaPlayerSeekMode::SEEK_PREVIOUS_SYNC /* mode */, &nextSubTimeUs);
 
@@ -831,6 +847,10 @@ void NuPlayer::GenericSource::sendTextData(
         if (msg->what() == kWhatSendSubtitleData) {
             nextSubTimeUs -= 1000000LL;  // send subtile data one second earlier
         }
+
+        if(textType > TextTrackType_3GPP)
+            nextSubTimeUs = 0ll;
+
         mMediaClock->addTimer(msg, nextSubTimeUs);
     }
 }
@@ -972,6 +992,7 @@ status_t NuPlayer::GenericSource::dequeueAccessUnit(
         sp<AMessage> msg = new AMessage(kWhatFetchTimedTextData, this);
         msg->setInt64("timeUs", timeUs);
         msg->setInt32("generation", mFetchTimedTextDataGeneration);
+        msg->setInt32("textTrackType", mTextTrackType);
         msg->post();
     }
 
@@ -1017,6 +1038,8 @@ sp<AMessage> NuPlayer::GenericSource::getTrackInfo(size_t trackIndex) const {
     } else if (!strncasecmp(mime, "audio/", 6)) {
         trackType = MEDIA_TRACK_TYPE_AUDIO;
     } else if (!strcasecmp(mime, MEDIA_MIMETYPE_TEXT_3GPP)) {
+        trackType = MEDIA_TRACK_TYPE_TIMEDTEXT;
+    } else if (!strcasecmp(mime,MEDIA_MIMETYPE_TEXT_SRT)){
         trackType = MEDIA_TRACK_TYPE_TIMEDTEXT;
     } else {
         trackType = MEDIA_TRACK_TYPE_UNKNOWN;
@@ -1102,6 +1125,13 @@ status_t NuPlayer::GenericSource::selectTrack(size_t trackIndex, bool select, in
     CHECK(meta->findCString(kKeyMIMEType, &mime));
     if (!strncasecmp(mime, "text/", 5)) {
         bool isSubtitle = strcasecmp(mime, MEDIA_MIMETYPE_TEXT_3GPP);
+
+        mTextTrackType = TextTrackType_3GPP;
+        if(!strcasecmp(mime, MEDIA_MIMETYPE_TEXT_SRT)){
+            isSubtitle = false;
+            mTextTrackType = TextTrackType_SRT;
+        }
+
         Track *track = isSubtitle ? &mSubtitleTrack : &mTimedTextTrack;
         if (track->mSource != NULL && track->mIndex == trackIndex) {
             return OK;
@@ -1144,6 +1174,7 @@ status_t NuPlayer::GenericSource::selectTrack(size_t trackIndex, bool select, in
             sp<AMessage> msg = new AMessage(kWhatFetchTimedTextData, this);
             msg->setInt64("timeUs", timeUs);
             msg->setInt32("generation", mFetchTimedTextDataGeneration);
+            msg->setInt32("textTrackType", mTextTrackType);
             msg->post();
         }
 
@@ -1214,6 +1245,10 @@ status_t NuPlayer::GenericSource::doSeek(int64_t seekTimeUs, MediaPlayerSeekMode
         ++mAudioDataGeneration;
         readBuffer(MEDIA_TRACK_TYPE_AUDIO, seekTimeUs, MediaPlayerSeekMode::SEEK_CLOSEST);
         mAudioLastDequeueTimeUs = seekTimeUs;
+    }
+
+    if (mTimedTextTrack.mSource != NULL && mTextTrackType > TextTrackType_3GPP) {
+        readBuffer(MEDIA_TRACK_TYPE_TIMEDTEXT, seekTimeUs);
     }
 
     if (mSubtitleTrack.mSource != NULL) {

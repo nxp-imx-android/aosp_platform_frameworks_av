@@ -80,6 +80,7 @@ extern const char *MEDIA_MIMETYPE_TEXT_SUBRIP;
 extern const char *MEDIA_MIMETYPE_TEXT_VTT;
 extern const char *MEDIA_MIMETYPE_TEXT_CEA_608;
 extern const char *MEDIA_MIMETYPE_TEXT_CEA_708;
+extern const char *MEDIA_MIMETYPE_TEXT_SRT;
 extern const char *MEDIA_MIMETYPE_DATA_TIMED_ID3;
 
 // These are values exported to JAVA API that need to be in sync with
