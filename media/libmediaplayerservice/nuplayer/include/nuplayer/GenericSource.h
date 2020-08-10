@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Copyright (C) 2016 Freescale Semiconductor, Inc. */
+/* Copyright 2017-2018 NXP */
 
 #ifndef GENERIC_SOURCE_H_
 
@@ -40,6 +42,7 @@ class MediaBuffer;
 struct MediaClock;
 struct NuCachedSource2;
 class IMediaExtractor;
+extern const char *MEDIA_MIMETYPE_TEXT_SRT;
 
 struct NuPlayer::GenericSource : public NuPlayer::Source,
                                  public MediaBufferObserver // Modular DRM
@@ -175,6 +178,12 @@ private:
 
     sp<ALooper> mLooper;
     sp<IMediaExtractor> mExtractor;
+
+    enum {
+    TextTrackType_3GPP = 0,
+    TextTrackType_SRT,
+    };
+    int32_t mTextTrackType;
 
     void resetDataSource();
 
