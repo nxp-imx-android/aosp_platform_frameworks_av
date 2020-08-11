@@ -55,6 +55,9 @@ static const int kInitialMarkMs        = 5000;  // 5secs
 //static const int kPausePlaybackMarkMs  = 2000;  // 2secs
 static const int kResumePlaybackMarkMs = 15000;  // 15secs
 
+//keep align with imx_android_mm/extractor/Imx_ext.h
+const char *MEDIA_MIMETYPE_TEXT_SRT = "text/srt";
+
 NuPlayer::GenericSource::GenericSource(
         const sp<AMessage> &notify,
         bool uidValid,

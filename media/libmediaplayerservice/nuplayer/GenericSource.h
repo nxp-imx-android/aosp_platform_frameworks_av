@@ -42,6 +42,7 @@ class MediaBuffer;
 struct MediaClock;
 struct NuCachedSource2;
 class IMediaExtractor;
+extern const char *MEDIA_MIMETYPE_TEXT_SRT;
 
 struct NuPlayer::GenericSource : public NuPlayer::Source,
                                  public MediaBufferObserver // Modular DRM
