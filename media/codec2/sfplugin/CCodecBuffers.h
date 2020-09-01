@@ -415,7 +415,7 @@ public:
             size_t *index,
             sp<Codec2Buffer> *buffer,
             std::function<bool(const sp<Codec2Buffer> &)> match =
-                [](const sp<Codec2Buffer> &) { return true; });
+                [](const sp<Codec2Buffer> &buffer) { return (buffer != nullptr); });
 
     /**
      * Return the buffer from the client, and get the C2Buffer object back from
