@@ -87,7 +87,6 @@ void readFromAMessage(const sp<AMessage> &msg, BufferingSettings *buffering /* n
 
 AString nameForFd(int fd);
 
-extern const char *MEDIA_MIMETYPE_AUDIO_AAC_EXT;
 bool canPassThrough(const sp<MetaData>& meta);
 }  // namespace android
 
