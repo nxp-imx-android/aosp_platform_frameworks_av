@@ -339,11 +339,11 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
                 if(!strncmp(inputBuf, "i.MX8QM", 7)){
                     specific_xml = true;
                     parser.parseXmlFilesInSearchDirs(
-                            { "media_codecs_8qm.xml", "media_codecs_performance_c2.xml" });
+                            { "media_codecs_8qm.xml", "media_codecs_performance_c2_8qm.xml" });
                 }else if(!strncmp(inputBuf, "i.MX8QXP", 8)){
                     specific_xml = true;
                     parser.parseXmlFilesInSearchDirs(
-                            { "media_codecs_8qxp.xml", "media_codecs_performance_c2.xml" });
+                            { "media_codecs_8qxp.xml", "media_codecs_performance_c2_8qxp.xml" });
                 }
             }
             fclose(f);
