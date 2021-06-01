@@ -946,6 +946,16 @@ status_t convertMetaDataToMessage(
 
     convertMetaDataToMessageFromMappings(meta, msg);
 
+    int32_t subFormat;
+    if (meta->findInt32(kKeySubFormat, &subFormat)) {
+        msg->setInt32("vendor.sub-format.value", subFormat);
+    }
+
+    int32_t lowLatency;
+    if (meta->findInt32(kKeyLowLatency, &lowLatency)) {
+        msg->setInt32("vendor.low-latency.value", lowLatency);
+    }
+
     uint32_t type;
     const void *data;
     size_t size;
@@ -1153,6 +1163,19 @@ status_t convertMetaDataToMessage(
         int32_t hapticChannelCount;
         if (meta->findInt32(kKeyHapticChannelCount, &hapticChannelCount)) {
             msg->setInt32("haptic-channel-count", hapticChannelCount);
+        }
+
+        int32_t audioBlockAlign;
+        if (meta->findInt32(kKeyAudioBlockAlign, &audioBlockAlign)) {
+            msg->setInt32("vendor.audio-block-align.value", audioBlockAlign);
+        }
+
+        int32_t bitsPerFrame;
+        if (meta->findInt32(kKeyBitsPerFrame, &bitsPerFrame)) {
+            msg->setInt32("vendor.bits-per-frame.value", bitsPerFrame);
+        }
+        if (meta->findInt32(kKeyVendorBitsPerSample, &bitsPerSample)) {
+            msg->setInt32("vendor.bits-per-sample.value", bitsPerSample);
         }
     }
 
@@ -1748,6 +1771,16 @@ status_t convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
         return BAD_VALUE;
     }
 
+    int32_t subFormat;
+    if (msg->findInt32("vendor.sub-format.value", &subFormat)) {
+        meta->setInt32(kKeySubFormat, subFormat);
+    }
+
+    int32_t lowLatency;
+    if (msg->findInt32("vendor.low-latency.value", &lowLatency)) {
+        meta->setInt32(kKeyLowLatency, lowLatency);
+    }
+
     convertMessageToMetaDataFromMappings(msg, meta);
 
     int32_t systemId;
@@ -1988,6 +2021,19 @@ status_t convertMessageToMetaData(const sp<AMessage> &msg, sp<MetaData> &meta) {
         int32_t hapticChannelCount;
         if (msg->findInt32("haptic-channel-count", &hapticChannelCount)) {
             meta->setInt32(kKeyHapticChannelCount, hapticChannelCount);
+        }
+
+        int32_t audioBlockAlign;
+        if (msg->findInt32("vendor.audio-block-align.value", &audioBlockAlign)) {
+            meta->setInt32(kKeyAudioBlockAlign, audioBlockAlign);
+        }
+
+        int32_t bitsPerFrame;
+        if (msg->findInt32("vendor.bits-per-frame.value", &bitsPerFrame)) {
+            meta->setInt32(kKeyBitsPerFrame, bitsPerFrame);
+        }
+        if (msg->findInt32("vendor.bits-per-sample.value", &bitsPerSample)) {
+            meta->setInt32(kKeyVendorBitsPerSample, bitsPerSample);
         }
     }
 
