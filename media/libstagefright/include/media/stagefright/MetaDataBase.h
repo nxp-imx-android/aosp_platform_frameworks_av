@@ -296,6 +296,14 @@ enum {
 
     // DVB teletext page number
     kKeyDvbTeletextPageNumber = 'ttxp', // int32_t, DVB teletext page number
+    kKeyIsADIF            = 'adif',  // bool (int32_t)
+    kKeySubFormat         = 'sFmt', // (int32_t)
+    kKeyCodecData         = 'cCdd', // raw data
+    kKeyVendorBitsPerSample = 'bPsp', // (int32_t)
+    kKeyAudioBlockAlign   = 'aBan', // (int32_t)
+    kKeyBitsPerFrame      = 'bPfm',
+    kKeySpecialThumbnail  = 'sThb',//int32_t
+    kKeyLowLatency        = 'lLty', // (int32_t)
 };
 
 enum {
