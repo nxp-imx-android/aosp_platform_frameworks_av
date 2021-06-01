@@ -277,6 +277,14 @@ enum {
     kKeyLastSampleIndexInChunk = 'lsic',  //int64_t, index of last sample in a chunk.
     kKeySampleTimeBeforeAppend = 'lsba', // int64_t, timestamp of last sample of a track.
 
+    kKeyIsADIF            = 'adif',  // bool (int32_t)
+    kKeySubFormat         = 'sFmt', // (int32_t)
+    kKeyCodecData         = 'cCdd', // raw data
+    kKeyVendorBitsPerSample = 'bPsp', // (int32_t)
+    kKeyAudioBlockAlign   = 'aBan', // (int32_t)
+    kKeyBitsPerFrame      = 'bPfm',
+    kKeySpecialThumbnail  = 'sThb',//int32_t
+    kKeyLowLatency        = 'lLty', // (int32_t)
 };
 
 enum {
