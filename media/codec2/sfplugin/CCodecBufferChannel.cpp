@@ -630,6 +630,21 @@ status_t CCodecBufferChannel::queueSecureInputBuffer(
         result = mCrypto->decrypt(
                 key, iv, mode, pattern, source, buffer->offset(),
                 subSamples, numSubSamples, destination, errorDetailMsg);
+#ifdef HANTRO_VPU
+        if (secure) {
+            C2WriteView view = block->map().get();
+            if (view.error() == C2_OK && view.size() == bufferSize) {
+                size_t offset = 0;
+                for (size_t i = 0; i < numSubSamples; i++) {
+                    const CryptoPlugin::SubSample& subSample = subSamples[i];
+                     memcpy(view.data() + offset,
+                            reinterpret_cast<const uint8_t*>(encryptedBuffer->getmMemory()->unsecurePointer()) + offset,
+                            subSample.mNumBytesOfClearData + subSample.mNumBytesOfEncryptedData);
+                    offset += subSample.mNumBytesOfClearData + subSample.mNumBytesOfEncryptedData;
+                }
+            }
+        }
+#endif
         if (result < 0) {
             ALOGI("[%s] decrypt failed: result=%zd", mName, result);
             return result;

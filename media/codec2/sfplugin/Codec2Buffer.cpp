@@ -989,6 +989,10 @@ bool EncryptedLinearBlockBuffer::copyDecryptedContent(
     return true;
 }
 
+sp<IMemory> EncryptedLinearBlockBuffer::getmMemory() {
+    return mMemory;
+}
+
 bool EncryptedLinearBlockBuffer::copyDecryptedContentFromMemory(size_t length) {
     return copyDecryptedContent(mMemory, length);
 }
