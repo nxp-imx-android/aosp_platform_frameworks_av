@@ -382,6 +382,7 @@ public:
      * \return secure buffer handle
      */
     native_handle_t *handle() const;
+    sp<IMemory> getmMemory();
 
 private:
 
