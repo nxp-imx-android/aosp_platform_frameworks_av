@@ -1127,7 +1127,7 @@ bool NuPlayer::Renderer::onDrainAudioQueue() {
             }
 
             //if audio clock has not started, then switch to system clock
-            if(mNextAudioClockUpdateTimeUs == -1){
+            if(mNextAudioClockUpdateTimeUs == -1 && mHasVideo){
                 int64_t unused;
                 int64_t nowUs = ALooper::GetNowUs();
                 if((mMediaClock->getMediaTime(nowUs, &unused) != OK)){
