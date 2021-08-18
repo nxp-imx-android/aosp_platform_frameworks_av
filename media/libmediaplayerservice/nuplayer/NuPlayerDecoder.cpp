@@ -324,14 +324,17 @@ void NuPlayer::Decoder::onConfigure(const sp<AMessage> &format) {
     mCodec->getName(&mComponentName);
 
     if (mComponentName.startsWith("c2.imx") && mComponentName.endsWith("decoder")){
+#if 0
         if( property_get_int32("media.hantro_vpu.enable-tile", 0)){
             format->setInt32("vendor.hal-pixel-format.value", 0x105);//HAL_PIXEL_FORMAT_NV12_G1_TILED
         }else if( property_get_int32("media.amphion_vpu.enable-tile", 0)){
             format->setInt32("vendor.hal-pixel-format.value", 0x104);//HAL_PIXEL_FORMAT_NV12_TILED
             ALOGI("use tile format by property");
         }
+        else
+#endif
 #ifdef MALONE_VPU
-        else{
+        {
             format->setInt32("vendor.hal-pixel-format.value", 0x14);//HAL_PIXEL_FORMAT_YCbCr_422_I
             ALOGI("enable YUYV format");
         }
