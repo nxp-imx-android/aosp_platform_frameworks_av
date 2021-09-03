@@ -693,6 +693,22 @@ public:
         {
             sp<GraphicBuffer> buffers[NUM_BUFFER_SLOTS];
             std::scoped_lock<std::mutex> lock(mMutex);
+            bool noInit = false;
+            for (int i = 0; i < NUM_BUFFER_SLOTS; ++i) {
+                if (!noInit && mProducer) {
+                    Return<HStatus> transResult =
+                            mProducer->detachBuffer(static_cast<int32_t>(i));
+                    noInit = !transResult.isOk() ||
+                             static_cast<HStatus>(transResult) == HStatus::NO_INIT;
+                    if (transResult.isOk() &&
+                            static_cast<HStatus>(transResult) == HStatus::BAD_VALUE) {
+                        std::shared_ptr<C2BufferQueueBlockPoolData> data = mPoolDatas[i].lock();
+                        if (data) {
+                            data->setDisplayStatus(true);
+                        }
+                    }
+                }
+            }
             int32_t oldGeneration = mGeneration;
             if (producer) {
                 mProducer = producer;
@@ -863,7 +879,7 @@ int C2BufferQueueBlockPoolData::migrate(
     mCurrentBqId = toBqId;
     mCurrentGeneration = toGeneration;
 
-    if (!mHeld || mBqId == 0) {
+    if ((!mHeld || mBqId == 0) && !mDisplay) {
         ALOGV("buffer is not owned");
         return -1;
     }
@@ -932,6 +948,10 @@ int C2BufferQueueBlockPoolData::migrate(
         ALOGD("attach failed %d", static_cast<int>(bStatus));
         return -1;
     }
+    if (mDisplay) {
+        (void)producer->cancelBuffer(slot, hidl_handle{}).isOk();
+        mDisplay = false;
+    }
     ALOGV("local migration from gen %u : %u slot %d : %d",
           mGeneration, toGeneration, mBqSlot, slot);
     mIgbp = producer;
@@ -947,6 +967,10 @@ int C2BufferQueueBlockPoolData::migrate(
         syncVar->unlock();
     }
     return slot;
+}
+
+void C2BufferQueueBlockPoolData::setDisplayStatus(bool display) {
+    mDisplay = display;
 }
 
 void C2BufferQueueBlockPoolData::getBufferQueueData(
