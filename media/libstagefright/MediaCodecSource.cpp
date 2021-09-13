@@ -46,6 +46,7 @@ const int32_t kDefaultSwVideoEncoderFormat = HAL_PIXEL_FORMAT_YCbCr_420_888;
 const int32_t kDefaultHwVideoEncoderFormat = HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED;
 const int32_t kDefaultVideoEncoderDataSpace = HAL_DATASPACE_V0_BT709;
 
+const int kMaxAudioEncoerNum = 200;
 const int kStopTimeoutUs = 300000; // allow 1 sec for shutting down encoder
 // allow maximum 1 sec for stop time offset. This limits the the delay in the
 // input source.
@@ -297,7 +298,7 @@ void MediaCodecSource::Puller::onMessageReceived(const sp<AMessage> &msg) {
 
             queue->mReadPendingSince = 0;
             // if we need to discard buffer
-            if (!queue->mPulling || queue->mPaused || err != OK) {
+            if (!queue->mPulling || queue->mPaused || err != OK || queue->mReadBuffers.size() > kMaxAudioEncoerNum) {
                 if (mbuf != NULL) {
                     mbuf->release();
                     mbuf = NULL;
