@@ -4543,6 +4543,16 @@ status_t AudioFlinger::onTransactWrapper(TransactionCode code,
             break;
     }
 
+    if (property_get_int32("vendor.audio.lpa.enable", 0)) {
+        ALOGD("IAudioFlinger: Disable timecheck in LPA mode");
+
+        if (IPCThreadState::self()->getCallingPid() != getpid()) {
+            AudioSystem::get_audio_policy_service();
+        }
+
+        return delegate();
+    }
+
     const std::string methodName = getIAudioFlingerStatistics().getMethodForCode(code);
     mediautils::TimeCheck check(
             std::string("IAudioFlinger::").append(methodName),
