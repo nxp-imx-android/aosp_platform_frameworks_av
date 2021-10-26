@@ -121,10 +121,10 @@ static status_t _ImageCopy(View &view, const MediaImage2 *img, ImagePixel *imgBa
 }  // namespace
 
 status_t ImageCopy(uint8_t *imgBase, const MediaImage2 *img, const C2GraphicView &view) {
+    //source resolution should be equal or larger than target resolution
     if (img == nullptr
         || imgBase == nullptr
-        || view.crop().width != img->mWidth
-        || view.crop().height != img->mHeight) {
+        || view.crop().width < img->mWidth || view.crop().height < img->mHeight) {
         return BAD_VALUE;
     }
     const uint8_t* src_y = view.data()[0];
@@ -139,8 +139,8 @@ status_t ImageCopy(uint8_t *imgBase, const MediaImage2 *img, const C2GraphicView
     int32_t dst_stride_y = img->mPlane[0].mRowInc;
     int32_t dst_stride_u = img->mPlane[1].mRowInc;
     int32_t dst_stride_v = img->mPlane[2].mRowInc;
-    int width = view.crop().width;
-    int height = view.crop().height;
+    int width = img->mWidth;
+    int height = img->mHeight;
 
     if (IsNV12(view)) {
         if (IsNV12(img)) {
@@ -206,10 +206,10 @@ status_t ImageCopy(uint8_t *imgBase, const MediaImage2 *img, const C2GraphicView
 }
 
 status_t ImageCopy(C2GraphicView &view, const uint8_t *imgBase, const MediaImage2 *img) {
+    //target resolution should be equal or smaller than source resolution
     if (img == nullptr
         || imgBase == nullptr
-        || view.crop().width != img->mWidth
-        || view.crop().height != img->mHeight) {
+        || view.crop().width > img->mWidth || view.crop().height > img->mHeight) {
         return BAD_VALUE;
     }
     const uint8_t* src_y = imgBase + img->mPlane[0].mOffset;

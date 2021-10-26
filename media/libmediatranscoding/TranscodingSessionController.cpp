@@ -993,6 +993,11 @@ void TranscodingSessionController::onProgressUpdate(ClientIdType clientId, Sessi
         }
         mSessionMap[sessionKey].lastProgress = progress;
     });
+
+    if(100 == progress){
+        mWatchdog->stop();
+        ALOGI("%s 100 persent, stop watch dog", __FUNCTION__);
+    }
 }
 
 void TranscodingSessionController::onHeartBeat(ClientIdType clientId, SessionIdType sessionId) {
