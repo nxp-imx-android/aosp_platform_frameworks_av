@@ -85,7 +85,6 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
     int32_t src_offset = 0;
     int32_t copy_offset = 0;
     int32_t copy_size = 0;
-    int32_t tar_offset = 0;
     uint32_t fromSize = src->size();
     uint8_t* src_ptr= NULL;
     uint8_t* tar_ptr= NULL;
@@ -171,8 +170,6 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
     src_ptr = src->data();
 
     while(outputBufferCnt > 0 && copy_offset < src_offset){
-        tar_ptr += tar_offset;
-        src_ptr += copy_offset;
         header4 = copy_size * 8;
 
         memcpy(tar_ptr,&header1,sizeof(uint16_t));
@@ -198,10 +195,10 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
         }
 
         outputBufferCnt --;
-        tar_offset += OUTPUT_BUFFER_SIZE-8;
         copy_offset += copy_size;
+        tar_ptr += OUTPUT_BUFFER_SIZE - 8;
+        src_ptr += copy_size;
         ALOGV("copy %d, total copy %d, total=%d",copy_size,copy_offset,fromSize);
- 
     }
 
     if(src->meta()->findInt64("timeUs", &timeUs)){
