@@ -1338,7 +1338,7 @@ status_t AudioPolicyService::onTransact(
         } else {
             getIAudioPolicyServiceStatistics().event(code, elapsedMs);
         }
-    });
+    }, 9000);
 
     switch (code) {
         case SHELL_COMMAND_TRANSACTION: {
