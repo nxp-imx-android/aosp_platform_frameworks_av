@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /* Copyright (C) 2016 Freescale Semiconductor, Inc. */
+/* Copyright 2022 NXP */
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "SessoinManager"
@@ -401,7 +402,7 @@ ssize_t NuPlayer::SessionManager::read(void * data, size_t size)
                     status_t err = mDataAvailableCond.waitRelative(mLock, WAIT_DATA_TIMEOUT * 1000000000LL);
                     if (err != OK) {
                         ALOGE("Wait for data timeout!");
-                        return -1;
+                        continue;
                     }
                 }
             }
