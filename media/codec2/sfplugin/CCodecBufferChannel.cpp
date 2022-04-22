@@ -855,6 +855,22 @@ status_t CCodecBufferChannel::renderOutputBuffer(
     std::shared_ptr<const C2StreamHdrStaticInfo::output> hdrStaticInfo =
         std::static_pointer_cast<const C2StreamHdrStaticInfo::output>(
                 c2Buffer->getInfo(C2StreamHdrStaticInfo::output::PARAM_TYPE));
+    if (hdrStaticInfo) {
+        std::shared_ptr<const C2StreamHdrStaticInfo::output> emptyInfo =
+            std::make_shared<C2StreamHdrStaticInfo::output>();
+        if (!memcmp(hdrStaticInfo.get(), emptyInfo.get(), sizeof(C2StreamHdrStaticInfo::output))) {
+            std::shared_ptr<const C2StreamColorAspectsInfo::output> colorAspectInfo =
+                std::static_pointer_cast<const C2StreamColorAspectsInfo::output>(
+                        c2Buffer->getInfo(C2StreamColorAspectsInfo::output::PARAM_TYPE));
+            uint32_t pixelFmt = 0;
+            (void)buffer->format()->findInt32("android._color-format", (int32_t *)&pixelFmt);
+            if (!colorAspectInfo || ((colorAspectInfo->transfer != C2Color::TRANSFER_ST2084
+                    && colorAspectInfo->transfer != C2Color::TRANSFER_HLG)
+                    || pixelFmt != 0x108 /* P010 */)) {
+                hdrStaticInfo.reset();
+            }
+        }
+    }
 
     // HDR10 plus info
     std::shared_ptr<const C2StreamHdr10PlusInfo::output> hdr10PlusInfo =
