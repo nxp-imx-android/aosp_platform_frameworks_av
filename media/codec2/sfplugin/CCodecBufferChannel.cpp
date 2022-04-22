@@ -849,6 +849,25 @@ status_t CCodecBufferChannel::renderOutputBuffer(
         hdr10PlusInfo.reset();
     }
 
+    // color aspect info
+    std::shared_ptr<const C2StreamColorAspectsInfo::output> colorAspectInfo =
+        std::static_pointer_cast<const C2StreamColorAspectsInfo::output>(
+                c2Buffer->getInfo(C2StreamColorAspectsInfo::output::PARAM_TYPE));
+    if (hdrStaticInfo && colorAspectInfo) {
+        // reset hdrStaticInfo if not satisfy (TransferST2084 || TransferHLG) && 10bit
+        C2StreamPixelFormatInfo::output pixel_fmt(0u);
+        (void)mComponent->query({&pixel_fmt,}, {}, C2_DONT_BLOCK, nullptr);
+        std::shared_ptr<const C2StreamHdrStaticInfo::output> emptyInfo =
+            std::make_shared<C2StreamHdrStaticInfo::output>();
+        if (0 == memcmp(hdrStaticInfo.get(), emptyInfo.get(), sizeof(C2StreamHdrStaticInfo::output))) {
+            if ((colorAspectInfo->transfer != C2Color::TRANSFER_ST2084
+                    && colorAspectInfo->transfer != C2Color::TRANSFER_HLG)
+                    || pixel_fmt.value != 0x108 /* P010 */) {
+                hdrStaticInfo.reset();
+            }
+        }
+    }
+
     std::vector<C2ConstGraphicBlock> blocks = c2Buffer->data().graphicBlocks();
     if (blocks.size() != 1u) {
         ALOGD("[%s] expected 1 graphic block, but got %zu", mName, blocks.size());
