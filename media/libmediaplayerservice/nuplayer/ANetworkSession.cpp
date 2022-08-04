@@ -962,6 +962,7 @@ status_t ANetworkSession::createClientOrServer(
     status_t err = OK;
     int s, res;
     sp<Session> session;
+    bool validRemoteHost = (remoteHost != NULL && strlen(remoteHost) > 0);
 
     s = socket(
             AF_INET,
@@ -1075,7 +1076,7 @@ status_t ANetworkSession::createClientOrServer(
 
                 bool is_multicast = false;
 
-                if (remoteHost != NULL) {
+                if (validRemoteHost) {
                     struct addrinfo hints, *res = 0;
                     int error;
                     char sport[16];
@@ -1128,7 +1129,7 @@ status_t ANetworkSession::createClientOrServer(
                    freeaddrinfo(res);
                 }
 
-                if (remoteHost != NULL && !is_multicast) {
+                if (validRemoteHost && !is_multicast) {
                     struct sockaddr_in remoteAddr;
                     memset(remoteAddr.sin_zero, 0, sizeof(remoteAddr.sin_zero));
                     remoteAddr.sin_family = AF_INET;
