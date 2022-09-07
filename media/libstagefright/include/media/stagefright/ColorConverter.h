@@ -29,6 +29,8 @@
 #include <media/hardware/VideoAPI.h>
 
 namespace android {
+//equal to 0x108 in /vendor/nxp-opensource/imx/include/graphics_ext.h
+#define HAL_PIXEL_FORMAT_NV15 0x108
 
 struct ColorConverter {
     ColorConverter(OMX_COLOR_FORMATTYPE from, OMX_COLOR_FORMATTYPE to);
@@ -214,6 +216,9 @@ private:
                 const BitmapParams &src, const BitmapParams &dst);
 
     status_t convertYUVP010ToRGBA1010102(
+                const BitmapParams &src, const BitmapParams &dst);
+
+    status_t convertNV15ToRGBA1010102(
                 const BitmapParams &src, const BitmapParams &dst);
 
     ColorConverter(const ColorConverter &);
