@@ -255,7 +255,8 @@ bool ColorConverter::isValid() const {
 #endif
         case COLOR_FormatYUVP010:
             return mDstFormat == COLOR_Format32bitABGR2101010;
-
+        case HAL_PIXEL_FORMAT_NV15:
+            return mDstFormat == COLOR_Format32bitABGR2101010;
         default:
             return false;
     }
@@ -320,7 +321,10 @@ ColorConverter::BitmapParams::BitmapParams(
         mBpp = 1;
         mStride = mWidth;
         break;
-
+    case HAL_PIXEL_FORMAT_NV15:
+        mBpp = 1;
+        mStride = mWidth * 5 / 4;
+        break;
     default:
         ALOGE("Unsupported color format %d", mColorFormat);
         mBpp = 1;
@@ -426,7 +430,9 @@ status_t ColorConverter::convert(
         case OMX_COLOR_FormatYCbYCr:
             err = convertYCbYCr(src, dst);
             break;
-
+        case HAL_PIXEL_FORMAT_NV15:
+            err = convertYUVP010(src, dst);
+            break;
         default:
         {
             CHECK(!"Should not be here. Unknown color conversion.");
@@ -907,6 +913,9 @@ status_t ColorConverter::convertYUV420Planar16(
 
 status_t ColorConverter::convertYUVP010(
         const BitmapParams &src, const BitmapParams &dst) {
+    if(mSrcFormat == HAL_PIXEL_FORMAT_NV15){
+        return convertNV15ToRGBA1010102(src, dst);
+    }
     if (mDstFormat == COLOR_Format32bitABGR2101010) {
         return convertYUVP010ToRGBA1010102(src, dst);
     }
@@ -975,6 +984,95 @@ status_t ColorConverter::convertYUVP010ToRGBA1010102(
 
         if (y & 1) {
             src_uv += src.mStride / 2;
+        }
+
+        dst_ptr += dst.mStride;
+    }
+
+    return OK;
+}
+
+status_t ColorConverter::convertNV15ToRGBA1010102(
+        const BitmapParams &src, const BitmapParams &dst) {
+
+    const struct Coeffs *matrix = getMatrix();
+    if (!matrix) {
+        return ERROR_UNSUPPORTED;
+    }
+
+    signed _b_u = matrix->_b_u;
+    signed _neg_g_u = -matrix->_g_u;
+    signed _neg_g_v = -matrix->_g_v;
+    signed _r_v = matrix->_r_v;
+    signed _y = matrix->_y;
+    signed _c16 = mSrcColorSpace.mRange == ColorUtils::kColorRangeLimited ? 64 : 0;
+
+    uint16_t *kAdjustedClip10bit = initClip10Bit();
+
+    auto writeToDst = getWriteToDst(mDstFormat, (void *)kAdjustedClip10bit);
+
+    uint8_t *dst_ptr = (uint8_t *)dst.mBits
+            + dst.mCropTop * dst.mStride + dst.mCropLeft * dst.mBpp;
+
+    uint8_t *src_y = (uint8_t *)src.mBits
+            + src.mCropTop * src.mStride + src.mCropLeft * src.mBpp;
+
+    uint8_t *src_uv = (uint8_t *)src.mBits
+            + src.mStride * src.mHeight
+            + (src.mCropTop / 2) * src.mStride + src.mCropLeft * src.mBpp;
+
+    uint16_t* y_addr;
+    uint16_t* uv_addr;
+
+    for (size_t y = 0; y < src.cropHeight(); ++y) {
+        for (size_t x = 0; x < src.cropWidth(); x += 2) {
+            signed y1, y2, u, v;
+            uint16_t y1_v;
+            uint16_t y2_v;
+            uint16_t u_v;
+            uint16_t v_v;
+            if(0 == x % 4){
+                y_addr = (uint16_t*)(src_y + x * 5 /4);
+                uv_addr = (uint16_t*)(src_uv + x * 5 /4);
+                y1_v = y_addr[0] & 0x3FF;
+                y2_v = (y_addr[0] >> 10) + ((uint16_t)(y_addr[1] & 0xF) << 6);
+                u_v = uv_addr[0] & 0x3FF;
+                v_v = (uv_addr[0] >> 10) + ((uint16_t)(uv_addr[1] & 0xF) << 6);
+            }else{
+                y1_v = (y_addr[1] >> 4) & 0x3FF;
+                y2_v = (y_addr[1] >> 14) + ((uint16_t)(y_addr[2] & 0xFF) << 2);
+                u_v = (uv_addr[1] >> 4) & 0x3FF;
+                v_v = (uv_addr[1] >> 14) + ((uint16_t)(uv_addr[2] & 0xFF) << 2);
+            }
+            y1 = y1_v - _c16;
+            y2 = y2_v - _c16;
+            u = int(u_v)-512;
+            v = int(v_v)-512;
+
+            signed u_b = u * _b_u;
+            signed u_g = u * _neg_g_u;
+            signed v_g = v * _neg_g_v;
+            signed v_r = v * _r_v;
+
+            signed tmp1 = y1 * _y + 128;
+            signed b1 = (tmp1 + u_b) / 256;
+            signed g1 = (tmp1 + v_g + u_g) / 256;
+            signed r1 = (tmp1 + v_r) / 256;
+
+            signed tmp2 = y2 * _y + 128;
+            signed b2 = (tmp2 + u_b) / 256;
+            signed g2 = (tmp2 + v_g + u_g) / 256;
+            signed r2 = (tmp2 + v_r) / 256;
+
+            bool uncropped = x + 1 < src.cropWidth();
+
+            writeToDst(dst_ptr + x * dst.mBpp, uncropped, r1, g1, b1, r2, g2, b2);
+        }
+
+        src_y += src.mStride;
+
+        if (y & 1) {
+            src_uv += src.mStride;
         }
 
         dst_ptr += dst.mStride;
