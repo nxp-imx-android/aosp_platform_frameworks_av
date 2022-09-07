@@ -955,6 +955,13 @@ status_t MediaImageDecoder::onOutputReceived(
         setFrame(frameMem);
     }
 
+    int32_t android_fmt = 0;
+    if(outputFormat->findInt32("android._color-format", &android_fmt) && android_fmt == HAL_PIXEL_FORMAT_NV15){
+        srcFormat = android_fmt;
+        stride /= 2;
+        ALOGD("MediaImageDecoder onOutputReceived change color-format=%x, stride=%d",srcFormat,stride);
+    }
+
     ColorConverter converter((OMX_COLOR_FORMATTYPE)srcFormat, dstFormat());
 
     uint32_t standard, range, transfer;
