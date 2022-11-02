@@ -36,9 +36,7 @@
 
 #define HIGH_WATERMARK (5 MB)
 #define LOW_WATERMARK (0 KB)//this value should be 0 to keep latency lowest.
-
-// if shift_point is 200KB, AVC_MP31_1280x720_AACLC_44.1kHz_2ch.ts will has no video output
-#define SHIFT_POINT (500 KB)
+#define SHIFT_POINT (128 KB)
 
 const static int64_t WAIT_DATA_TIMEOUT = 10; // seconds
 
