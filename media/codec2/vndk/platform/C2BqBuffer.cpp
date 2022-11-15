@@ -451,6 +451,10 @@ private:
                 } else {
                     (void)mProducer->cancelBuffer(slot, hFenceWrapper.getHandle()).isOk();
                 }
+
+                if (bufferNeedsReallocation) {
+                    mNeedReallocationSlot = slot;
+                }
                 return C2_BLOCKING;
             }
             if (status != android::NO_ERROR) {
@@ -479,6 +483,10 @@ private:
 
         sp<GraphicBuffer> &slotBuffer = mBuffers[slot];
         uint32_t outGeneration;
+        if (!bufferNeedsReallocation && mNeedReallocationSlot == slot) {
+            bufferNeedsReallocation = true;
+            mNeedReallocationSlot = -1;
+        }
         if (bufferNeedsReallocation || !slotBuffer) {
             if (!slotBuffer) {
                 slotBuffer = new GraphicBuffer();
@@ -576,7 +584,9 @@ public:
     Impl(const std::shared_ptr<C2Allocator> &allocator)
         : mInit(C2_OK), mProducerId(0), mGeneration(0),
           mConsumerUsage(0), mDqFailure(0), mLastDqTs(0),
-          mLastDqLogTs(0), mAllocator(allocator), mIgbpValidityToken(std::make_shared<int>(0)) {
+          mLastDqLogTs(0), mAllocator(allocator),
+          mIgbpValidityToken(std::make_shared<int>(0)),
+          mNeedReallocationSlot(-1) {
     }
 
     ~Impl() {
@@ -799,6 +809,8 @@ private:
     // if the token has been expired, the buffers will not call IGBP::cancelBuffer()
     // when they are no longer used.
     std::shared_ptr<int> mIgbpValidityToken;
+
+    int32_t mNeedReallocationSlot;
 };
 
 C2BufferQueueBlockPoolData::C2BufferQueueBlockPoolData(
