@@ -20,7 +20,7 @@ protected:
     bool enableOffload();
     int32_t getAudioOutputFlags();
     status_t parseAccessUnit(sp<ABuffer> *accessUnit);
-    status_t getFrameLen(sp<ABuffer> *accessUnit,int32_t offset,int32_t *len);
+    status_t getFrameLen(sp<ABuffer> *accessUnit,int32_t offset,int32_t *len, int32_t *substream);
     status_t getCacheSize(size_t *cacheSize,size_t * bufferSize);
 private:
     size_t mFrameSize;

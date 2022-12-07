@@ -92,6 +92,7 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
     uint32_t blockNum = 0;
     uint32_t outputBufferCnt = 0;
     int32_t frameLen = 0;
+    int32_t buffer_size = 0;
 
     //skip empty buffer
     if(fromSize == 0)
@@ -121,22 +122,31 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
     }
 
     while(src_offset < (int32_t)fromSize){
+        int32_t substream = 0;
 
-        if(OK != getFrameLen(&src,src_offset,&frameLen)){
+        if(OK != getFrameLen(&src,src_offset,&frameLen,&substream)){
             src_offset += 1;
             ALOGE("can't find DDP header");
             continue;
         }else{
             ALOGV("src_offset=%d,frameLen=%d",src_offset,frameLen);
         }
+
         if(src_offset + frameLen > (int32_t)fromSize){
             ALOGV("frame len is larger than current buffer, src_offset=%d,frameLen=%d,size=%d",src_offset,frameLen,fromSize);
             break;
         }
         src_offset += frameLen;
-        frameCnt++;
-        blockNum += mNumBlocks;
 
+        if(0 == substream){
+            frameCnt++;
+            blockNum += mNumBlocks;
+        }
+
+        if(blockNum > 6 && 0 == buffer_size){
+            //frame length of 6 blocks including substreams
+            buffer_size = src_offset - frameLen;
+        }
     }
 
     //wait until get 6 audio blocks
@@ -161,7 +171,7 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
     copy_size = src_offset;
 
     if(outputBufferCnt > 1)
-        copy_size = frameLen;
+        copy_size = buffer_size;
 
     if(copy_size+8 > OUTPUT_BUFFER_SIZE)
         return BAD_VALUE;
@@ -231,7 +241,7 @@ status_t NuPlayer::DecoderPassThroughDDP::parseAccessUnit(sp<ABuffer> *accessUni
     #endif
     return OK;
 }
-status_t NuPlayer::DecoderPassThroughDDP::getFrameLen(sp<ABuffer> *accessUnit,int32_t offset,int32_t *len)
+status_t NuPlayer::DecoderPassThroughDDP::getFrameLen(sp<ABuffer> *accessUnit,int32_t offset,int32_t *len,int32_t *substream)
 {
     int32_t fscod = 0;
     int32_t frmsizecod = 0;
@@ -240,6 +250,8 @@ status_t NuPlayer::DecoderPassThroughDDP::getFrameLen(sp<ABuffer> *accessUnit,in
     mNumBlocks = 0;
     uint8_t * pHeader = NULL;
     bool bigEndian = true;//big enadian for most case
+    uint8_t strmtyp = 0;
+    uint8_t substreamid = 0;
 
     if(accessUnit == NULL || len == NULL)
         return BAD_VALUE;
@@ -251,10 +263,14 @@ status_t NuPlayer::DecoderPassThroughDDP::getFrameLen(sp<ABuffer> *accessUnit,in
 
     //big endian, stream order
     if(pHeader[0] == 0x0b && pHeader[1] == 0x77){
+        strmtyp = (pHeader[2] >> 6) & 0x3;
+        substreamid = (pHeader[2] >> 3) & 0x7;
         frmsizecod = ((pHeader[2] & 0x7) << 8) + pHeader[3];
         fscod = pHeader[4] >> 6;
         bsid = (pHeader[5] >> 3) & 0x1f;
     }else if(pHeader[0] == 0x77 && pHeader[1] == 0x0b){
+        strmtyp = (pHeader[3] >> 6) & 0x3;
+        substreamid = (pHeader[3] >> 3) & 0x7;
         frmsizecod = ((pHeader[3] & 0x7) << 8) + pHeader[2];
         fscod = pHeader[5] >> 6;
         bsid = (pHeader[4] >> 3) & 0x1f;
@@ -271,6 +287,7 @@ status_t NuPlayer::DecoderPassThroughDDP::getFrameLen(sp<ABuffer> *accessUnit,in
         }
         //samplerate = ac3_sampling_rate[fscod];
         *len = 2 * ac3_frame_size[fscod][frmsizecod];
+        *substream = 0;
         ALOGV("getFrameLen fscod = %d len=%d",fscod,*len);
     //ddp
     }else if(bsid > 10 && bsid <= 16){
@@ -294,7 +311,9 @@ status_t NuPlayer::DecoderPassThroughDDP::getFrameLen(sp<ABuffer> *accessUnit,in
             mNumBlocks += 1;
 
         *len = (frmsizecod+1)*2;
-        ALOGV("numBlocks = %zu fscod = %d len=%d",mNumBlocks,fscod,*len);
+
+        *substream = (strmtyp & 0x1) << 3 | substreamid;
+        ALOGV("numBlocks = %zu fscod = %d len=%d, substream=%d",mNumBlocks,fscod,*len, *substream);
 
     }
 
