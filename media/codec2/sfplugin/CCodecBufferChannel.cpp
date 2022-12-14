@@ -2077,6 +2077,7 @@ void CCodecBufferChannel::sendOutputBuffers() {
         if (!output->buffers) {
             return;
         }
+        Mutex::Autolock autoLock(mSendBufferLock);
         action = output->buffers->popFromStashAndRegister(
                 &c2Buffer, &index, &outBuffer);
         if (action != OutputBuffers::REALLOCATE) {
