@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 The Android Open Source Project
+ * Copyright 2023 NXP.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +29,7 @@
 #include <media/stagefright/MediaErrors.h>
 #include <renderengine/RenderEngine.h>
 #include <utils/Log.h>
+#define IS_VENDOR_FORMAT(f) (((f) >= 0x104 && (f) <= 0x110) || ((f) == HAL_PIXEL_FORMAT_YCBCR_P010))
 
 namespace android {
 
@@ -89,6 +91,14 @@ void FrameCaptureLayer::BufferLayer::getLayerSettings(
     layerSettings->sourceDataspace = translateDataspace(
             static_cast<ui::Dataspace>(mBufferItem.mDataSpace));
 
+    if (IS_VENDOR_FORMAT(mBufferItem.mGraphicBuffer->getPixelFormat()))
+    {
+        layerSettings->source.buffer.buffer = nullptr;
+        layerSettings->source.solidColor = half3(0.0, 0.0, 0.0);
+        layerSettings->disableBlending = true;
+        layerSettings->alpha = 1.0f;
+        return;
+    }
     // from BufferLayer
     layerSettings->source.buffer.buffer = mBufferItem.mGraphicBuffer;
     layerSettings->source.buffer.isOpaque = true;
