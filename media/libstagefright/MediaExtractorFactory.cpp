@@ -127,6 +127,7 @@ Mutex MediaExtractorFactory::gPluginMutex;
 std::shared_ptr<std::list<sp<ExtractorPlugin>>> MediaExtractorFactory::gPlugins;
 bool MediaExtractorFactory::gPluginsRegistered = false;
 bool MediaExtractorFactory::gIgnoreVersion = false;
+static const char *gLastExtractor = "MP3 Extractor";
 
 // static
 void *MediaExtractorFactory::sniff(
@@ -151,6 +152,10 @@ void *MediaExtractorFactory::sniff(
         void *newMeta = nullptr;
         FreeMetaFunc newFreeMeta = nullptr;
 
+        if(*it == plugins->back() && bestCreator != NULL && *confidence > 0.2f){
+            ALOGV("skip extractor %s", gLastExtractor);
+            continue;
+        }
         void *curCreator = NULL;
         if ((*it)->def.def_version == EXTRACTORDEF_VERSION_NDK_V1) {
             curCreator = (void*) (*it)->def.u.v2.sniff(
@@ -268,6 +273,11 @@ void MediaExtractorFactory::RegisterExtractors(
 }
 
 static bool compareFunc(const sp<ExtractorPlugin>& first, const sp<ExtractorPlugin>& second) {
+    //after sort, last extractor is in the end of list
+    if(!strcmp(gLastExtractor, first->def.extractor_name))
+        return false;
+    if(!strcmp(gLastExtractor, second->def.extractor_name))
+        return true;
     return strcmp(first->def.extractor_name, second->def.extractor_name) < 0;
 }
 
