@@ -899,6 +899,7 @@ void CCodec::configure(const sp<AMessage> &msg) {
                             config->mPushBlankBuffersOnStop = true;
                         }
                     }
+                    msg->setString("vendor.surface-name.value", (const AString)surface->getConsumerName());
                 }
             }
             setSurface(surface);
