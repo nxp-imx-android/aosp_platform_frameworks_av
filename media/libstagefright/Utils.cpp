@@ -54,6 +54,8 @@
 #define AMEDIAFORMAT_KEY_MPEGH_COMPATIBLE_SETS \
   "mpegh-compatible-sets"
 
+const char *MEDIA_MIMETYPE_AUDIO_DSD = "audio/vnd.sony.dsd";
+
 namespace {
     // TODO: this should possibly be handled in an else
     constexpr static int32_t AACObjectNull = 0;
@@ -2401,6 +2403,7 @@ static const struct mime_conv_t mimeLookup[] = {
     { MEDIA_MIMETYPE_AUDIO_AC4,         AUDIO_FORMAT_AC4},
     { MEDIA_MIMETYPE_AUDIO_FLAC,        AUDIO_FORMAT_FLAC},
     { MEDIA_MIMETYPE_AUDIO_ALAC,        AUDIO_FORMAT_ALAC },
+    { MEDIA_MIMETYPE_AUDIO_DSD,         AUDIO_FORMAT_DSD},
     { 0, AUDIO_FORMAT_INVALID }
 };
 
