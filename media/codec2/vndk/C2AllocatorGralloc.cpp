@@ -650,14 +650,14 @@ c2_status_t C2AllocationGralloc::map(
             }
 
             addr[C2PlanarLayout::PLANE_Y] = (uint8_t *)ycbcrLayout.y;
-            addr[C2PlanarLayout::PLANE_U] = (uint8_t *)ycbcrLayout.cb;
-            addr[C2PlanarLayout::PLANE_V] = (uint8_t *)ycbcrLayout.cr;
+            addr[C2PlanarLayout::PLANE_U] = (uint8_t *)ycbcrLayout.y + 1;
+            addr[C2PlanarLayout::PLANE_V] = (uint8_t *)ycbcrLayout.y + 3;
             layout->type = C2PlanarLayout::TYPE_YUV;
-            layout->numPlanes = 1;
+            layout->numPlanes = 3;
             layout->rootPlanes = 1;
             layout->planes[C2PlanarLayout::PLANE_Y] = {
                 C2PlaneInfo::CHANNEL_Y,         // channel
-                (int32_t)ycbcrLayout.chroma_step,// colInc
+                (int32_t)2,                     // colInc
                 (int32_t)ycbcrLayout.ystride,   // rowInc
                 1,                              // mColSampling
                 1,                              // mRowSampling
@@ -670,29 +670,29 @@ c2_status_t C2AllocationGralloc::map(
             };
             layout->planes[C2PlanarLayout::PLANE_U] = {
                 C2PlaneInfo::CHANNEL_CB,          // channel
-                (int32_t)ycbcrLayout.chroma_step,  // colInc
-                (int32_t)ycbcrLayout.cstride,     // rowInc
+                (int32_t)4,                       // colInc
+                (int32_t)ycbcrLayout.ystride,     // rowInc
                 2,                                // mColSampling
-                2,                                // mRowSampling
+                1,                                // mRowSampling
                 8,                                // allocatedDepth
                 8,                                // bitDepth
                 0,                                // rightShift
                 C2PlaneInfo::NATIVE,              // endianness
-                C2PlanarLayout::PLANE_U,          // rootIx
-                0,                                // offset
+                C2PlanarLayout::PLANE_Y,          // rootIx
+                1,                                // offset
             };
             layout->planes[C2PlanarLayout::PLANE_V] = {
                 C2PlaneInfo::CHANNEL_CR,          // channel
-                (int32_t)ycbcrLayout.chroma_step,  // colInc
-                (int32_t)ycbcrLayout.cstride,     // rowInc
+                (int32_t)4,                       // colInc
+                (int32_t)ycbcrLayout.ystride,     // rowInc
                 2,                                // mColSampling
-                2,                                // mRowSampling
+                1,                                // mRowSampling
                 8,                                // allocatedDepth
                 8,                                // bitDepth
                 0,                                // rightShift
                 C2PlaneInfo::NATIVE,              // endianness
-                C2PlanarLayout::PLANE_V,          // rootIx
-                0,                                // offset
+                C2PlanarLayout::PLANE_Y,          // rootIx
+                3,                                // offset
             };
             ALOGV("lockYCbCr YCBCR_422_I success yStride=%zu",ycbcrLayout.cstride);
             break;
