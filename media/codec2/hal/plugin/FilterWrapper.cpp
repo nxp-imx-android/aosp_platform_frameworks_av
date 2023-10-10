@@ -991,9 +991,9 @@ public:
 
         for (size_t i = mFilters.size(); i > 0; --i) {
             if (i == 1) {
-                backPropagateParams_l(mIntf, mFilters[0].intf, mayBlock);
+                backPropagateParams_l(mFilters[0].intf, mIntf, mayBlock);
             } else {
-                backPropagateParams_l(mFilters[i - 2].intf, mFilters[i - 1].intf, mayBlock);
+                backPropagateParams_l(mFilters[i - 1].intf, mFilters[i - 2].intf, mayBlock);
             }
         }
 
